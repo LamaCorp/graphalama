@@ -6,6 +6,7 @@ import pygame
 
 from colors import Color
 from constants import *
+from maths import clamp
 from shapes import Rectangle
 
 
@@ -232,6 +233,7 @@ class Widget:
         scaled_h = new_screen_size[1] - (past_screen_size[1] - self.shape.exact_height)
 
         if self.anchor & LEFT and self.anchor & RIGHT:
+            new_x = self.x + clamp(scaled_w, self.shape.min_size[0], self.shape.max_size[0]) // 2
             new_w = scaled_w
         elif self.anchor & LEFT:
             new_x = self.pos[0]
@@ -239,6 +241,7 @@ class Widget:
             new_x = new_screen_size[0] - (past_screen_size[0] - (self.x + self.shape.width))
 
         if self.anchor & TOP and self.anchor & BOTTOM:
+            new_y = self.y + clamp(scaled_h, self.shape.min_size[1], self.shape.max_size[0]) // 2
             new_h = scaled_h
         elif self.anchor & TOP:
             new_y = self.pos[1]

@@ -2,7 +2,7 @@ from _dummy_thread import start_new_thread
 
 import pygame
 
-from constants import TOPLEFT, GREY, WHITESMOKE, BLUE, BLACK, RED, TRANSPARENT, CENTER, ALLANCHOR
+from constants import BLACK, ALLANCHOR
 from core import Widget
 from text import SimpleText
 
@@ -12,7 +12,7 @@ class Button(Widget):
         super().__init__(pos, shape, color, bg_color, border_color, anchor)
 
         if isinstance(content, str):
-            size = self.shape.inside_surf().size
+            size = self.shape.content_rect().size
             content = SimpleText(content, (size[0]/2, size[1]/2), size, BLACK, anchor=ALLANCHOR)
 
         self.child = content

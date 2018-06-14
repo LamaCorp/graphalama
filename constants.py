@@ -53,3 +53,7 @@ COLORS = [
     GREEN, DK_GREEN, FLASH_GREEN,
     ORANGE, YELLOW, PUMPKIN, GOLD,
 ]
+
+# Propagation
+UP = 1
+DOWN = 2

@@ -25,7 +25,7 @@ class SimpleText(Widget):
         if self._content:
             return
 
-        img = pygame.Surface(self.shape.inside_surf().size, pygame.SRCALPHA)
+        img = pygame.Surface(self.shape.content_rect().size, pygame.SRCALPHA)
 
         fg = (255, 255, 255, 255)
         temp = self.font.render(self.text, True, fg)

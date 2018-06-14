@@ -7,13 +7,10 @@ Every function provides anti-aliased shapes.
 
 import pygame
 from pygame import gfxdraw
-
-
 from pygame.constants import SRCALPHA, BLEND_RGBA_MAX, BLEND_RGBA_MIN
 from pygame.math import Vector2
 
 from constants import BLACK
-from maths import merge_rects
 
 
 def line(surf, start, end, color=BLACK, width=1):
@@ -200,4 +197,4 @@ def polygon(surf, points, color):
     return pygame.Rect(x, y, xm - x, ym - y)
 
 
-__all__ = ['circle', 'line', 'polygon', 'ring']
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect']

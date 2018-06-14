@@ -9,7 +9,7 @@ from constants import *
 from shapes import Rectangle
 
 
-class Widget(pygame.rect.RectType):
+class Widget:
     def __init__(self, pos, shape, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, anchor=DEFAULT):
         """
         The base of any widget.
@@ -20,24 +20,14 @@ class Widget(pygame.rect.RectType):
         :param anchor: The sides where the widget will be anchored: BOTTOM|RIGHT
         """
 
-
         if isinstance(shape, tuple):
             shape = Rectangle(shape)
-
         if not isinstance(color, Color):
             color = Color(color) if color else Color(BLACK)
-
         if not isinstance(bg_color, Color):
             bg_color = Color(bg_color) if bg_color else Color(LLAMA)
-
         if not isinstance(border_color, Color):
             border_color = Color(border_color) if border_color else Color(GREY)
-
-        self.shape = shape  # type: Rectangle
-        """Determine the global geometrical shape of the widget, where it's clickable, its shadow"""
-        self.shape.widget = self
-
-        super(Widget, self).__init__(pos, shape.size)
 
         self._child = None  # type: Widget
         self.child = None  # type: Widget
@@ -49,17 +39,27 @@ class Widget(pygame.rect.RectType):
         self.bg_color = bg_color
         self.border_color = border_color
 
-        self._pos = pos
-        self._anchor = anchor if anchor is not None else TOPLEFT
-
         self.pos = pos
         self.anchor = anchor if anchor is not None else TOPLEFT
+
+        self.shape = None  # type: Rectangle
+        """
+        Determine the global geometrical shape of the widget, where it's clickable, its shadow.
+        Don't assign shape, use .set_shape(shape) instead.
+        """
+        self.set_shape(shape)
 
         self._img = None  # type: pygame.SurfaceType
         self._bg = None  # type: pygame.SurfaceType
         self._content = None  # type: pygame.SurfaceType
 
         self.visible = True
+
+    def set_shape(self, shape: Rectangle):
+        """Change the shape of the widget."""
+        self.shape = shape
+        self.shape.widget = self
+        self.invalidate()
 
     @property
     def child(self):
@@ -108,7 +108,7 @@ class Widget(pygame.rect.RectType):
         # create the surface
         img = pygame.Surface(self.shape.total_size, flags=pygame.SRCALPHA)
         img.blit(self._bg, (0, 0))
-        img.blit(self._content, self.shape.inside_surf().topleft)
+        img.blit(self._content, self.shape.content_rect().topleft)
 
         self._img = img
 
@@ -146,7 +146,7 @@ class Widget(pygame.rect.RectType):
         # Then we draw the border
         self.draw_border(bg)
         # we blit the bg on the image
-        img.blit(bg, (0,0))
+        img.blit(bg, (0, 0))
 
         self._bg = img
 
@@ -157,7 +157,7 @@ class Widget(pygame.rect.RectType):
         surf = pygame.Surface(img.get_size(), pygame.SRCALPHA)
 
         self.border_color.paint(surf)
-        mask = self.shape.create_border_mask()
+        mask = self.shape.get_border_mask()
         surf.blit(mask, (0, 0), None, pygame.BLEND_RGBA_MULT)
         img.blit(surf, (0, 0))
 
@@ -165,24 +165,30 @@ class Widget(pygame.rect.RectType):
         if self._content:
             return
 
-        self._content = pygame.Surface(self.shape.inside_surf().size, pygame.SRCALPHA)
+        self._content = pygame.Surface(self.shape.content_rect().size, pygame.SRCALPHA)
 
         if self.child:
             self.child.render(self._content)
 
-
-    def invalidate(self):
+    def invalidate(self, _propagation=UP | DOWN):
         """Forces the widget to re-draw"""
 
-        if self.parent:
-            self.parent.invalidate_content()
+        if _propagation & UP and self.parent:
+            self.parent.invalidate_content(UP)
+        if _propagation & DOWN and self.child:
+            self.child.invalidate(DOWN)
 
         self._img = None
         self._bg = None
         self._content = None
 
-    def invalidate_content(self):
+    def invalidate_content(self, _propagation=UP | DOWN):
         """Force the widget to redraw its content."""
+
+        if _propagation & UP and self.parent:
+            self.parent.invalidate_content(UP)
+        if _propagation & DOWN and self.child:
+            self.child.invalidate(DOWN)
 
         if self._img or self._content:
             self._img = None
@@ -193,48 +199,16 @@ class Widget(pygame.rect.RectType):
 
     def invalidate_bg(self):
         """Force the widget to redraw the background."""
+
+        # The background doesn't change the contents, we don't need to propagate down
+        if self.parent:
+            # but the contents of the container must be updated
+            self.parent.invalidate_content(UP)
+
         self._img = None
         self._bg = None
 
     # Pos, size, anchor
-
-    def resize(self, new_screen_size, past_screen_size):
-
-        past_inside_size = self.shape.inside_surf().size
-
-        new_x = self._pos[0] * new_screen_size[0] / past_screen_size[0]
-        new_y = self._pos[1] * new_screen_size[1] / past_screen_size[1]
-
-        new_w, new_h = self.size
-        scaled_w = new_screen_size[0] - (past_screen_size[0] - self.shape.exact_size[0])
-        scaled_h = new_screen_size[1] - (past_screen_size[1] - self.shape.exact_size[1])
-
-        if self.anchor & LEFT and self.anchor & RIGHT:
-            new_x = self.pos[0]
-            new_w = scaled_w
-        elif self.anchor & LEFT:
-            new_x = self.pos[0]
-        elif self.anchor & RIGHT:
-            new_x = new_screen_size[0] - (past_screen_size[0] - self.right)
-
-        if self.anchor & TOP and self.anchor & BOTTOM:
-            new_y = self.pos[1]
-            new_h = scaled_h
-        elif self.anchor & TOP:
-            new_y = self.pos[1]
-        elif self.anchor & BOTTOM:
-            new_y = new_screen_size[1] - (past_screen_size[1] - self.bottom)
-
-        self.shape.size = (new_w, new_h)
-        self.pos = (new_x, new_y)
-
-        # resizing child
-        if self.child:
-            self.child.resize(self.shape.inside_surf().size, past_inside_size)
-
-    @property
-    def size(self):
-        return self.shape.size
 
     @property
     def pos(self):
@@ -243,13 +217,50 @@ class Widget(pygame.rect.RectType):
     @pos.setter
     def pos(self, value):
         self._pos = value
-        self.anchor = self.anchor  # sync the Rect pos with mine
+        if self.parent:
+            self.parent.invalidate_content(UP)
+
+    def resize(self, new_screen_size, past_screen_size):
+
+        past_inside_size = self.shape.content_rect().size
+
+        new_x = self._pos[0] * new_screen_size[0] / past_screen_size[0]
+        new_y = self._pos[1] * new_screen_size[1] / past_screen_size[1]
+
+        new_w, new_h = self.size
+        scaled_w = new_screen_size[0] - (past_screen_size[0] - self.shape.exact_width)
+        scaled_h = new_screen_size[1] - (past_screen_size[1] - self.shape.exact_height)
+
+        if self.anchor & LEFT and self.anchor & RIGHT:
+            new_w = scaled_w
+        elif self.anchor & LEFT:
+            new_x = self.pos[0]
+        elif self.anchor & RIGHT:
+            new_x = new_screen_size[0] - (past_screen_size[0] - (self.x + self.shape.width))
+
+        if self.anchor & TOP and self.anchor & BOTTOM:
+            new_h = scaled_h
+        elif self.anchor & TOP:
+            new_y = self.pos[1]
+        elif self.anchor & BOTTOM:
+            new_y = new_screen_size[1] - (past_screen_size[1] - (self.y + self.shape.height))
+
+        self.shape.size = (new_w, new_h)
+        self.pos = (new_x, new_y)
+
+        # resizing child
+        if self.child:
+            self.child.resize(self.shape.content_rect().size, past_inside_size)
+
+    @property
+    def size(self):
+        return self.shape.size
 
     @property
     def absolute_topleft(self):
         if self.parent:
             par_tl = self.parent.absolute_topleft
-            pitl = self.parent.shape.inside_surf().topleft
+            pitl = self.parent.shape.content_rect().topleft
             return (par_tl[0] + pitl[0] + self.x,
                     par_tl[1] + pitl[1] + self.y)
         else:
@@ -260,34 +271,30 @@ class Widget(pygame.rect.RectType):
         return pygame.Rect(self.absolute_topleft, self.size)
 
     @property
-    def anchor(self):
-        return self._anchor
-
-    @anchor.setter
-    def anchor(self, anchor):
-
-        # don't change and modify something at the same time
-        pos = self.pos
-
-        if anchor & TOP and anchor & BOTTOM:
-            self.centery = pos[1]
-        elif anchor & TOP:
-            self.y = pos[1]
-        elif anchor & BOTTOM:
-            self.bottom = pos[1]
+    def x(self):
+        if self.anchor & LEFT and self.anchor & RIGHT:
+            return self.pos[0] - self.shape.width // 2
+        elif self.anchor & LEFT:
+            return self.pos[0]
+        elif self.anchor & RIGHT:
+            return self.pos[0] - self.shape.width
         else:
-            self.centery = pos[1]
+            return self.pos[0] - self.shape.width // 2
 
-        if anchor & LEFT and anchor & RIGHT:
-            self.centerx = pos[0]
-        elif anchor & LEFT:
-            self.left = pos[0]
-        elif anchor & RIGHT:
-            self.right = pos[0]
+    @property
+    def y(self):
+        if self.anchor & TOP and self.anchor & BOTTOM:
+            return self.pos[1] - self.shape.height // 2
+        elif self.anchor & TOP:
+            return self.pos[1]
+        elif self.anchor & BOTTOM:
+            return self.pos[1] - self.shape.height
         else:
-            self.centerx = pos[0]
+            return self.pos[1] - self.shape.height // 2
 
-        self._anchor = anchor
+    @property
+    def topleft(self):
+        return self.x, self.y
 
     @staticmethod
     def anchor_to_rect_attr(anchor):
@@ -296,14 +303,14 @@ class Widget(pygame.rect.RectType):
             LEFT: "midleft",
             RIGHT: "midright",
             BOTTOM: "midbottom",
-            TOP|LEFT: "topleft",
-            TOP|RIGHT: "topright",
-            BOTTOM|LEFT: "bottomleft",
-            BOTTOM|RIGHT: "bottomright",
-            TOP|LEFT|RIGHT: "midtop",
-            BOTTOM|LEFT|RIGHT: "midbottom",
-            LEFT|TOP|BOTTOM: "midleft",
-            RIGHT|TOP|BOTTOM: "midright",
+            TOP | LEFT: "topleft",
+            TOP | RIGHT: "topright",
+            BOTTOM | LEFT: "bottomleft",
+            BOTTOM | RIGHT: "bottomright",
+            TOP | LEFT | RIGHT: "midtop",
+            BOTTOM | LEFT | RIGHT: "midbottom",
+            LEFT | TOP | BOTTOM: "midleft",
+            RIGHT | TOP | BOTTOM: "midright",
         }
 
         return d.get(anchor, "center")
@@ -324,4 +331,3 @@ class WidgetList(list):
     def resize(self, new_screen_size, past_screen_size):
         for w in self:
             w.resize(new_screen_size, past_screen_size)
-

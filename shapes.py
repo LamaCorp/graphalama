@@ -202,10 +202,10 @@ class PolarCurve(Rectangle):
 
         # post treatment
 
-        dist = 2
-        last = 10000000, 42
-        for i, (x, y) in enumerate(pts[:]):
-            if (last[0] - x) ** 2 + (last[1] - y) ** 2 < dist ** 2:
+        dist = 1
+        last = pts[0]
+        for i, (x, y) in enumerate(pts[1:]):
+            if (last[0] - x) ** 2 + (last[1] - y) ** 2 < 1: # dist ** 2:
                 pts.remove((x, y))
             else:
                 last = x, y

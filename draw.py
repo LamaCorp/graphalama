@@ -12,6 +12,12 @@ from pygame.math import Vector2
 
 from constants import BLACK
 
+try:
+    from PIL import Image, ImageFilter
+except (ImportError, ModuleNotFoundError):
+    PIL = False
+else:
+    PIL = True
 
 def line(surf, start, end, color=BLACK, width=1):
     """Draws an antialiased line on the surface."""
@@ -197,4 +203,19 @@ def polygon(surf, points, color):
     return pygame.Rect(x, y, xm - x, ym - y)
 
 
-__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect']
+def blur(img: pygame.Surface, blur=2):
+    """
+    Blur the image with a gaussian blur.
+
+    Does nothing is PIL is not available.
+    """
+
+    if not PIL:
+        return img
+
+    tmp = Image.frombytes("RGBA", img.get_size(), pygame.image.tostring(img, "RGBA"))
+    tmp = tmp.filter(ImageFilter.GaussianBlur(blur))
+    return pygame.image.frombuffer(tmp.tobytes("raw", "RGBA"), tmp.size, "RGBA")
+
+
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blur"]

@@ -7,9 +7,10 @@ import pygame
 def clamp(value, min=None, max=None):
     """Clamp the value between min and max. Only one boundary can be specified."""
     if min is not None and value < min:
-        value = min
+        return min
+
     if max is not None and value > max:
-        value = max
+        return max
 
     return value
 

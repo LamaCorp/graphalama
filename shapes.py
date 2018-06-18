@@ -49,7 +49,7 @@ class Rectangle:
         self.border = border if border else 0
 
         self.bg_offset = (0, 0)
-        self.shadow_offset = shadow_offset if shadow_offset else (0, 0)
+        self.shadow_offset = (4, 4) if shadow_offset else (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
 
@@ -57,7 +57,8 @@ class Rectangle:
 
     @property
     def total_size(self):
-        return self.width + self.shadow_offset[0], self.height + self.shadow_offset[1]
+        return (self.width + self.shadow_offset[0],
+                self.height + self.shadow_offset[1])
 
     @property
     def width(self):

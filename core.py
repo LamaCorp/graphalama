@@ -6,8 +6,15 @@ import pygame
 
 from colors import Color
 from constants import *
+from draw import blur
 from maths import clamp
 from shapes import Rectangle
+
+try:
+    PIL = True
+    from PIL import Image, ImageFilter
+except (ImportError, ModuleNotFoundError):
+    PIL = None
 
 
 class Widget:
@@ -110,7 +117,6 @@ class Widget:
         # create the surface
         img = pygame.Surface(self.shape.total_size, flags=pygame.SRCALPHA)
         img.blit(self._bg, self.shape.bg_offset)
-        print(9999, self.shape.bg_offset, self.shape.content_rect())
         img.blit(self._content, self.shape.content_rect())
 
         # noinspection PyArgumentList
@@ -121,10 +127,23 @@ class Widget:
     def draw_shadow(self, img):
         so = self.shape.shadow_offset
         if any(so):
-            mask = self.shape.get_mask()
-            mask.blit(mask, (-so[0], -so[1]), None, pygame.BLEND_RGBA_SUB)
-            mask.fill((0, 0, 0, 42), None, pygame.BLEND_RGBA_MULT)
-            img.blit(mask, so)
+
+            if not PIL:  # no pillow, simple shadow
+                mask = self.shape.get_mask()
+                mask.blit(mask, (-so[0], -so[1]), None, pygame.BLEND_RGBA_SUB)
+                mask.fill((0, 0, 0, 42), None, pygame.BLEND_RGBA_MULT)
+                img.blit(mask, so)
+
+            else:
+                margin = min(self.shape.shadow_offset) // 2
+                mask = self.shape.get_mask()
+                mask.fill((0, 0, 0, 128), None, pygame.BLEND_RGBA_MULT)
+                tmp = pygame.Surface((mask.get_width() + 2 * margin,
+                                      mask.get_height() + 2 * margin), pygame.SRCALPHA)
+                tmp.blit(mask, (margin, margin))
+                tmp = blur(tmp, margin)
+                tmp.blit(mask, (0, 0), None, pygame.BLEND_RGBA_SUB)
+                img.blit(tmp, (0, 0))
 
     def draw_background(self):
         """

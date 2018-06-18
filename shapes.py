@@ -48,6 +48,7 @@ class Rectangle:
 
         self.border = border if border else 0
 
+        self.bg_offset = (0, 0)
         self.shadow_offset = shadow_offset if shadow_offset else (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
@@ -103,7 +104,7 @@ class Rectangle:
         """
 
         mask = self.get_mask()
-        mask.fill(OUTSIDE, self.content_rect())
+        mask.fill(OUTSIDE, (self.border, self.border, self.width - 2 * self.border, self.height - 2 * self.border))
         return mask
 
     def content_rect(self):
@@ -112,7 +113,8 @@ class Rectangle:
         """
 
         s = self.size
-        return pygame.Rect((self.border, self.border),
+        return pygame.Rect((self.border + self.bg_offset[0],
+                            self.border + self.bg_offset[1]),
                            (s[0] - 2*self.border,
                             s[1] - 2*self.border))
 
@@ -163,7 +165,10 @@ class RoundedRect(Rectangle):
 
     def content_rect(self):
         delta = (1 - HALFSQRT2) * self.exact_rounding + self.border
-        return pygame.Rect(delta, delta, self.size[0] - 2 * delta, self.size[1] - 2 * delta)
+        return pygame.Rect(delta + self.bg_offset[0],
+                           delta + self.bg_offset[1],
+                           self.size[0] - 2 * delta,
+                           self.size[1] - 2 * delta)
 
     def is_inside(self, point):
         super(RoundedRect, self).is_inside(point)

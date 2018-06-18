@@ -33,6 +33,8 @@ class Button(Widget):
             self._clicked = value
             self.invalidate_bg()
 
+        self.shape.bg_offset = (1, 1) if self._clicked else (0, 0)
+
     @property
     def hovered(self):
         return self._hovered
@@ -78,7 +80,7 @@ class Button(Widget):
         super().draw_background()
 
         if self.clicked:
-            shade = (204,) * 3
+            shade = (222,) * 3
         elif self.hovered:
             shade = (242,) * 3
         else:
@@ -86,7 +88,7 @@ class Button(Widget):
 
         shade_img = pygame.Surface(self.size)
         shade_img.fill(shade)
-        self._bg.blit(shade_img, (0, 0), None, pygame.BLEND_RGBA_MULT)
+        self._bg.blit(shade_img, self.shape.bg_offset, None, pygame.BLEND_RGBA_MULT)
 
     def draw_border(self, img):
         super().draw_border(img)

@@ -32,7 +32,6 @@ class Widget:
 
         self._child = None  # type: Widget
         self.child = None  # type: Widget
-        """Widget contained inside the widget. Not every widget can act as containers."""
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
@@ -68,6 +67,8 @@ class Widget:
 
     @child.setter
     def child(self, value: "Widget"):
+        """Widget contained inside the widget. Not every widget can act as containers."""
+
         # remove the parent of the last child
         if self.child:
             self.child.parent = None
@@ -108,8 +109,9 @@ class Widget:
 
         # create the surface
         img = pygame.Surface(self.shape.total_size, flags=pygame.SRCALPHA)
-        img.blit(self._bg, (0, 0))
-        img.blit(self._content, self.shape.content_rect().topleft)
+        img.blit(self._bg, self.shape.bg_offset)
+        print(9999, self.shape.bg_offset, self.shape.content_rect())
+        img.blit(self._content, self.shape.content_rect())
 
         # noinspection PyArgumentList
         img.convert_alpha()
@@ -121,7 +123,7 @@ class Widget:
         if any(so):
             mask = self.shape.get_mask()
             mask.blit(mask, (-so[0], -so[1]), None, pygame.BLEND_RGBA_SUB)
-            mask.fill((0, 0, 0, 64), None, pygame.BLEND_RGBA_MULT)
+            mask.fill((0, 0, 0, 42), None, pygame.BLEND_RGBA_MULT)
             img.blit(mask, so)
 
     def draw_background(self):

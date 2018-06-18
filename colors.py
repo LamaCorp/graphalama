@@ -59,3 +59,81 @@ class Gradient(Color):
                 color = mix(self.color, self.end, 1 - y/(height-1))
                 pygame.gfxdraw.hline(surf, 0, width, y, color)
 
+
+class MultiGradient(Gradient):
+    def __init__(self, *colors, positions=None, horizontal=True):
+        """
+        Paint a surface with a multicolored gradient (with two or more points).
+
+        Exemple for an equaly spaced blue-yellow-orange-red gradient:
+            >>> from constants import BLUE, YELLOW, ORANGE, RED
+            >>> MultiGradient(BLUE, YELLOW, ORANGE, RED)
+
+        You can also choose where the color points are. Here the orange-red part
+        will take the left half of the gradient whereas the blue-yellow and yellow-orange
+        would take only a fourth. The positions are between 0 and 1
+            >>> MultiGradient(BLUE, YELLOW, ORANGE, RED, positions=(0, 1/4, 1/2, 1))
+
+        If horizontal is True, then the gradient is drawn top to bottom and not left to right.
+        """
+
+        assert len(colors) >= 2
+        assert positions is None or len(positions) == len(colors), \
+            "If you define position, give them for each color"
+
+        super().__init__(colors[0], colors[1], horizontal)
+
+        self.colors = colors
+
+        if positions:
+            self.positions = tuple(positions)
+        else:
+            # -1 because n points define n-1 ranges
+            spacing = 1 / (len(colors) - 1)
+            self.positions = tuple(spacing * i for i in range(len(self.colors)))
+
+    def paint(self, surf: pygame.Surface):
+        width, height = surf.get_size()
+
+        color_index = 0
+
+        # The idea is that we break the multi color gradient into 2-colors gradients
+        # and then use the Gradient.paint method to paint them
+
+        if self.horizontal:
+            # beggining if the first color isn't at x=0
+            surf.fill(self.colors[0], (0, 0, round(self.positions[0] * width), height))
+
+            for (start_pos, end_pos, start_color, end_color) in zip(self.positions[:-1],
+                                                                    self.positions[1:],
+                                                                    self.colors[:-1],
+                                                                    self.colors[1:]):
+                start_x = round(start_pos * width)
+                end_x = round(end_pos * width)
+
+                self.color = start_color
+                self.end = end_color
+
+                super(MultiGradient, self).paint(surf.subsurface((start_x, 0, end_x - start_x, height)))
+
+            end_pos = round(self.positions[-1] * width)
+            surf.fill(self.colors[-1], (end_pos, 0, width - end_pos, height))
+        else:
+
+            # beggining if the first color isn't at x=0
+            surf.fill(self.colors[0], (0, 0, width, round(self.positions[0] * height)))
+
+            for (start_pos, end_pos, start_color, end_color) in zip(self.positions[:-1],
+                                                                    self.positions[1:],
+                                                                    self.colors[:-1],
+                                                                    self.colors[1:]):
+                start_y = round(start_pos * height)
+                end_y = round(end_pos * height)
+
+                self.color = start_color
+                self.end = end_color
+
+                super(MultiGradient, self).paint(surf.subsurface((0, start_y, width, end_y - start_y)))
+
+            end_pos = round(self.positions[-1] * height)
+            surf.fill(self.colors[-1], (0, end_pos, width, height - end_pos))

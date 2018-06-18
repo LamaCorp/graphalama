@@ -111,6 +111,9 @@ class Widget:
         img.blit(self._bg, (0, 0))
         img.blit(self._content, self.shape.content_rect().topleft)
 
+        # noinspection PyArgumentList
+        img.convert_alpha()
+
         self._img = img
 
     def draw_shadow(self, img):
@@ -123,7 +126,7 @@ class Widget:
 
     def draw_background(self):
         """
-        Draws the background of the widget if it'snot already.
+        Draws the background of the widget if isn't already.
 
         To redraw it, use .invalidate_bg() first.
         """
@@ -149,6 +152,9 @@ class Widget:
         # we blit the bg on the image
         img.blit(bg, (0, 0))
 
+        # noinspection PyArgumentList
+        img.convert_alpha()
+
         self._bg = img
 
     def draw_border(self, img):
@@ -170,6 +176,9 @@ class Widget:
 
         if self.child:
             self.child.render(self._content)
+
+        # noinspection PyArgumentList
+        self._content.convert_alpha()
 
     def invalidate(self, _propagation=UP | DOWN):
         """Forces the widget to re-draw"""

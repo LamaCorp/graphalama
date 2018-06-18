@@ -18,7 +18,30 @@ class Button(Widget):
         self.child = content
         self.function = function
 
+        self._clicked = False
+        self._hovered = False
         self.clicked = False
+        self.hovered = False
+
+    @property
+    def clicked(self):
+        return self._clicked
+
+    @clicked.setter
+    def clicked(self, value):
+        if self._clicked != value:
+            self._clicked = value
+            self.invalidate_bg()
+
+    @property
+    def hovered(self):
+        return self._hovered
+
+    @hovered.setter
+    def hovered(self, value):
+        if self._hovered != value:
+            self._hovered = value
+            self.invalidate_bg()
 
     def update(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -37,6 +60,36 @@ class Button(Widget):
                 return True
             self.clicked = False
 
+        elif event.type == pygame.MOUSEMOTION:
+            self.hovered = self.absolute_rect.collidepoint(*event.pos)
+            return False  # allow other to handle the motion if user is sliding a bar etc.
+        return False
 
+    def draw(self):
+        super().draw()
 
+    def draw_shadow(self, img):
+        super().draw_shadow(img)
 
+    def draw_background(self):
+        if self._bg:
+            return
+
+        super().draw_background()
+
+        if self.clicked:
+            shade = (204,) * 3
+        elif self.hovered:
+            shade = (242,) * 3
+        else:
+            return
+
+        shade_img = pygame.Surface(self.size)
+        shade_img.fill(shade)
+        self._bg.blit(shade_img, (0, 0), None, pygame.BLEND_RGBA_MULT)
+
+    def draw_border(self, img):
+        super().draw_border(img)
+
+    def draw_content(self):
+        super().draw_content()

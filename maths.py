@@ -1,6 +1,7 @@
 """
 Math functions and object useful in any code.
 """
+from collections import namedtuple
 from math import sqrt
 
 import pygame
@@ -29,7 +30,7 @@ def merge_rects(rect1, rect2):
     return pygame.Rect(x, y, right - x, bot - y)
 
 
-class Pos(tuple):
+class Pos(namedtuple("Pos", ('x', 'y'))):
     """A vector."""
 
     def __new__(cls, *c):
@@ -83,3 +84,7 @@ class Pos(tuple):
     def norm(self):
         """Return the norm of the vector"""
         return sqrt(self.squared_norm())
+
+
+if __name__ == '__main__':
+    print(Pos(3, 4))

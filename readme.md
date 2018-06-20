@@ -55,10 +55,10 @@ For any widget you need to have at least 3 parts in the code to implement it: cr
 Say you want to add a button in your window. A big green play button. We reduce each step to the minimun.
 
 - Creation :
-      `play_button = Button("PLAY", (200, 200), color=GREEN, action=play)`
+      `play_button = Button("PLAY", (200, 200), color=GREEN, function=play)`
 - Input handling (clicks):
-        `event_used = play_button.update(event)`
-- Rendering: `screen.blit(play_button, play_button.topleft)`
+        `play_button.update(event)`
+- Rendering: `play_button.render(screen)`
 
 
 ## Customisation
@@ -71,8 +71,9 @@ A widget is made of three things:
  
 Those three layers are mixed together to create the widget. To customise our widgets we can therefore easily change one of those three layers.
 
-### Custom shadow
 ### Custom Shape
-Let's start again with your play button: `Button("PLAY", (200, 200), color=GREEN, action=play)`. The default shape is a `RoundedRect` with very small rounding.
+Let's start again with your play button: `Button("PLAY", (200, 200), color=GREEN, function=play)`. The default shape is a `RoundedRect` with very small rounding.
 
 ### Custom content
+
+### Custom shadow

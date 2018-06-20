@@ -84,7 +84,3 @@ class Pos(namedtuple("Pos", ('x', 'y'))):
     def norm(self):
         """Return the norm of the vector"""
         return sqrt(self.squared_norm())
-
-
-if __name__ == '__main__':
-    print(Pos(3, 4))

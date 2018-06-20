@@ -27,7 +27,7 @@ class Rectangle:
     The base shape that represent a rectangle.
     """
 
-    def __init__(self, size, border=DEFAULT, shadow_offset=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
         """
         The most basic shape: a rectangle.
 
@@ -49,16 +49,10 @@ class Rectangle:
         self.border = border if border else 0
 
         self.bg_offset = (0, 0)
-        self.shadow_offset = (4, 4) if shadow_offset else (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
 
     # Size, width, height
-
-    @property
-    def total_size(self):
-        return (self.width + self.shadow_offset[0],
-                self.height + self.shadow_offset[1])
 
     @property
     def width(self):
@@ -128,16 +122,10 @@ class Rectangle:
 
         return 0 < point[0] < self.width and 0 < point[1] < self.height
 
-    def has_border(self):
-        return self.border
-
-    def has_shadow(self):
-        return any(self.shadow_offset)
 
 class RoundedRect(Rectangle):
-    def __init__(self, size, rounding=20, percent=True, border=DEFAULT,
-                 shadow_offset=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
-        super().__init__(size, border, shadow_offset, min_size, max_size)
+    def __init__(self, size, rounding=20, percent=True, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+        super().__init__(size, border, min_size, max_size)
 
         self.percent = percent
         """If true the rounding is evalutate in purcentage of the size, otherwise in pixels."""
@@ -176,17 +164,17 @@ class RoundedRect(Rectangle):
 
 
 class Circle(RoundedRect):
-    def __init__(self, diameter, border=DEFAULT, shadow_offset=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
-        super().__init__((diameter, diameter), 100, True, border, shadow_offset, min_size, max_size)
+    def __init__(self, diameter, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+        super().__init__((diameter, diameter), 100, True, border, min_size, max_size)
 
 
 class PolarCurve(Rectangle):
-    def __init__(self, size, x_of_t, y_of_t, border=DEFAULT, shadow_offset=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size, x_of_t, y_of_t, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
 
         self.x = x_of_t
         self.y = y_of_t
 
-        super().__init__(size, border, shadow_offset, min_size, max_size)
+        super().__init__(size, border, min_size, max_size)
 
     def get_mask(self):
         mask = pygame.Surface(self.size, pygame.SRCALPHA)

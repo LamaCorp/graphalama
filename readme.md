@@ -27,7 +27,7 @@ Most pygame applications look like this
 
     # Setup of variables, objects...
     stop = False
-    screen = pygame.display.get((400, 300))
+    screen = pygame.display.get((400, 400))
 
     # Main loop
     while not stop:
@@ -57,4 +57,18 @@ Say you want to add a button in your window. A big green play button. We reduce 
 - Rendering: `screen.blit(play_button, play_button.topleft)`
 
 
-        
+## Customisation
+
+Before knowing how to cutomise your widgets so they match your style, we have to understand what is a widget.
+A widget is made of three things:
+ - a **Shadow**: optional, it provides a nice depth to our application and accentuate our widgets
+ - a **Shape**: defines the shape of the background. It also defines the borders, the size and where you can click/select the widget. To list a few common: Rectangle, Circle, RoundedRect... 
+ - a **content**: the information of the widget, it can be the widget's own content or a child widget (did you know that we can put any widget inside a Button ?)
+ 
+Those three layers are mixed together to create the widget. To customise our widgets we can therefore easily change one of those three layers.
+
+### Custom shadow
+### Custom Shape
+Let's start again with your play button: `Button("PLAY", (200, 200), color=GREEN, action=play)`. The default shape is a `RoundedRect` with very small rounding.
+
+### Custom content

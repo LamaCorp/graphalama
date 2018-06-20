@@ -6,8 +6,8 @@ import pygame
 
 from colors import Color
 from constants import *
-from draw import blur
 from maths import clamp
+from shadow import NoShadow, Shadow
 from shapes import Rectangle
 
 try:
@@ -18,7 +18,8 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Widget:
-    def __init__(self, pos, shape, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, anchor=DEFAULT):
+    def __init__(self, pos, shape, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, shadow=DEFAULT,
+                 anchor=DEFAULT):
         """
         The base of any widget.
 
@@ -49,24 +50,15 @@ class Widget:
         self.pos = pos
         self.anchor = anchor if anchor is not None else TOPLEFT
 
-        self.shape = None  # type: Rectangle
-        """
-        Determine the global geometrical shape of the widget, where it's clickable, its shadow.
-        Don't assign shape, use .set_shape(shape) instead.
-        """
-        self.set_shape(shape)
+        self.shadow = shadow if shadow else Shadow()  # type: Shadow
+        self.shape = shape  # type: Rectangle
 
+        self._shadow_img = None  # type: pygame.SurfaceType
         self._img = None  # type: pygame.SurfaceType
         self._bg = None  # type: pygame.SurfaceType
         self._content = None  # type: pygame.SurfaceType
 
         self.visible = True
-
-    def set_shape(self, shape: Rectangle):
-        """Change the shape of the widget."""
-        self.shape = shape
-        self.shape.widget = self
-        self.invalidate()
 
     @property
     def child(self):
@@ -85,6 +77,27 @@ class Widget:
         if value:
             self.child.parent = self
 
+    @property
+    def shadow(self):
+        """The shadow of the widget."""
+        return self._shadow  # type: NoShadow
+
+    @shadow.setter
+    def shadow(self, value):
+        self._shadow = value
+        self.invalidate_bg()
+
+    @property
+    def shape(self):
+        """The global geometrical shape of the widget, where it's clickable, its border..."""
+        return self._shape
+
+    @shape.setter
+    def shape(self, value):
+        self._shape = value
+        self.shape.widget = self
+        self.invalidate()
+
     # Inputs
 
     def __contains__(self, point):
@@ -95,55 +108,59 @@ class Widget:
 
     # Drawing methods
 
+    @property
+    def background_image(self):
+        if not self._bg:
+            self.draw_background()
+
+        return self._bg  # type: pygame.SurfaceType
+
+    @property
+    def content_image(self):
+        if not self._content:
+            self.draw_content()
+
+        return self._content
+
+    @property
+    def shadow_image(self):
+        if not self._shadow_img:
+            self.draw_shadow()
+
+        return self._shadow_img
+
+    @property
+    def widget_image(self):
+        if not self._img:
+            self.draw()
+
+        return self._img
+
     def render(self, screen):
         if not self.visible:
             return
 
-        if self._img is None:
-            self.draw()
-
-        screen.blit(self._img, self.topleft)
+        screen.blit(self.widget_image, self.blit_pos)
 
     def draw(self):
         """Draw the whole widget on its ._img"""
 
-        if self._img:
-            return
-
-        # we draw background and content to have both ._bg and ._content
-        self.draw_background()
-        self.draw_content()
-
         # create the surface
-        img = pygame.Surface(self.shape.total_size, flags=pygame.SRCALPHA)
-        img.blit(self._bg, self.shape.bg_offset)
-        img.blit(self._content, self.shape.content_rect())
+        img = pygame.Surface(self.blit_size, flags=pygame.SRCALPHA)
+        print(img.get_size())
+        if self.shadow:
+            img.blit(self.shadow_image, (0, 0))
+        img.blit(self.background_image, self.shape.bg_offset + self.shadow.bg_offset)
+        img.blit(self.content_image, self.shape.content_rect() + self.shadow.bg_offset)
 
         # noinspection PyArgumentList
         img.convert_alpha()
 
         self._img = img
 
-    def draw_shadow(self, img):
-        so = self.shape.shadow_offset
-        if any(so):
-
-            if not PIL:  # no pillow, simple shadow
-                mask = self.shape.get_mask()
-                mask.blit(mask, (-so[0], -so[1]), None, pygame.BLEND_RGBA_SUB)
-                mask.fill((0, 0, 0, 42), None, pygame.BLEND_RGBA_MULT)
-                img.blit(mask, so)
-
-            else:
-                margin = min(self.shape.shadow_offset) // 2
-                mask = self.shape.get_mask()
-                mask.fill((0, 0, 0, 128), None, pygame.BLEND_RGBA_MULT)
-                tmp = pygame.Surface((mask.get_width() + 2 * margin,
-                                      mask.get_height() + 2 * margin), pygame.SRCALPHA)
-                tmp.blit(mask, (margin, margin))
-                tmp = blur(tmp, margin)
-                tmp.blit(mask, (0, 0), None, pygame.BLEND_RGBA_SUB)
-                img.blit(tmp, (0, 0))
+    def draw_shadow(self):
+        if self.shadow:
+            self._shadow_img = self.shadow.create_from(self)
 
     def draw_background(self):
         """
@@ -155,11 +172,6 @@ class Widget:
         if self._bg:
             return
 
-        img = pygame.Surface(self.shape.total_size, pygame.SRCALPHA)
-
-        # we draw the shadow on the image
-        self.draw_shadow(img)
-
         # And create the background
         bg = pygame.Surface(self.shape.size, pygame.SRCALPHA)
         self.bg_color.paint(bg)
@@ -170,13 +182,11 @@ class Widget:
 
         # Then we draw the border
         self.draw_border(bg)
-        # we blit the bg on the image
-        img.blit(bg, (0, 0))
 
         # noinspection PyArgumentList
-        img.convert_alpha()
+        bg.convert_alpha()
 
-        self._bg = img
+        self._bg = bg
 
     def draw_border(self, img):
         if not self.shape.border:
@@ -210,6 +220,7 @@ class Widget:
             self.child.invalidate(DOWN)
 
         self._img = None
+        self._shadow_img = None
         self._bg = None
         self._content = None
 
@@ -238,6 +249,7 @@ class Widget:
 
         self._img = None
         self._bg = None
+        self._shadow_img = None
 
     # Pos, size, anchor
 
@@ -328,6 +340,16 @@ class Widget:
     @property
     def topleft(self):
         return self.x, self.y
+
+    @property
+    def blit_pos(self):
+        return (self.x - self.shadow.offset.left,
+                self.y - self.shadow.offset.top)
+
+    @property
+    def blit_size(self):
+        return (self.shape.width + self.shadow.extra_size[0],
+                self.shape.height + self.shadow.extra_size[1])
 
     @staticmethod
     def anchor_to_rect_attr(anchor):

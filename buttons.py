@@ -8,8 +8,9 @@ from text import SimpleText
 
 
 class Button(Widget):
-    def __init__(self, content, function, pos, shape, color=None, bg_color=None, border_color=None, anchor=None):
-        super().__init__(pos, shape, color, bg_color, border_color, anchor)
+    def __init__(self, content, function, pos, shape, color=None, bg_color=None, border_color=None, shadow=None,
+                 anchor=None):
+        super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
         if isinstance(content, str):
             size = self.shape.content_rect().size
@@ -67,12 +68,6 @@ class Button(Widget):
             return False  # allow other to handle the motion if user is sliding a bar etc.
         return False
 
-    def draw(self):
-        super().draw()
-
-    def draw_shadow(self, img):
-        super().draw_shadow(img)
-
     def draw_background(self):
         if self._bg:
             return
@@ -89,9 +84,3 @@ class Button(Widget):
         shade_img = pygame.Surface(self.size)
         shade_img.fill(shade)
         self._bg.blit(shade_img, self.shape.bg_offset, None, pygame.BLEND_RGBA_MULT)
-
-    def draw_border(self, img):
-        super().draw_border(img)
-
-    def draw_content(self):
-        super().draw_content()

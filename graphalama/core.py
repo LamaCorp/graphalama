@@ -147,7 +147,6 @@ class Widget:
 
         # create the surface
         img = pygame.Surface(self.blit_size, flags=pygame.SRCALPHA)
-        print(img.get_size())
         if self.shadow:
             img.blit(self.shadow_image, (0, 0))
         img.blit(self.background_image, self.shape.bg_offset + self.shadow.bg_offset)

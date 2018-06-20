@@ -18,6 +18,10 @@ The goal of this librairy is to answer all those questions and provide the easie
 
 ## Instalation
 
+    git clone https://gitlab.com/lama-corp/graphalama
+    cd graphalama
+    python setup.py install -U
+
 ## How to use
 
 Most pygame applications look like this

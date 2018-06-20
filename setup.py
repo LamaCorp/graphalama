@@ -14,7 +14,7 @@ long_description = ''
 
 setup(
     name='graphalama',
-    version='0.0',
+    version='0.0.1',
     description='Easy to use widgets for pygame',
     long_description=long_description,
     classifiers=[
@@ -32,6 +32,6 @@ setup(
     },
     include_package_data=True,
     install_requires=['pygame'],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    # setup_requires=['pytest-runner'],
+    # tests_require=['pytest'],
 )

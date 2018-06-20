@@ -2,9 +2,9 @@ from _dummy_thread import start_new_thread
 
 import pygame
 
-from constants import BLACK, ALLANCHOR
-from core import Widget
-from text import SimpleText
+from .constants import BLACK, ALLANCHOR
+from .core import Widget
+from .text import SimpleText
 
 
 class Button(Widget):

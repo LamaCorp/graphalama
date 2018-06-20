@@ -1,8 +1,8 @@
 import pygame
 
-from constants import CENTER, DEFAULT, TRANSPARENT
-from core import Widget
-from font import default_font
+from .constants import CENTER, DEFAULT, TRANSPARENT
+from .core import Widget
+from .font import default_font
 
 
 class SimpleText(Widget):

@@ -9,8 +9,8 @@ from collections import namedtuple
 from pygame.constants import SRCALPHA, BLEND_RGBA_MULT, BLEND_RGBA_SUB
 from pygame.surface import Surface
 
-from draw import blur
-from maths import Pos
+from .draw import blur
+from .maths import Pos
 
 Offset = namedtuple("Offset", "top left bottom right")
 

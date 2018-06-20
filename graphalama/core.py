@@ -4,11 +4,11 @@ You shouldn't need to import or use this module unless you are developping new w
 """
 import pygame
 
-from colors import Color
-from constants import *
-from maths import clamp
-from shadow import NoShadow, Shadow
-from shapes import Rectangle
+from .colors import Color
+from .constants import *
+from .maths import clamp
+from .shadow import NoShadow, Shadow
+from .shapes import Rectangle
 
 try:
     PIL = True

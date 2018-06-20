@@ -1,5 +1,14 @@
+# Pycharm
 .idea/
-cookbook.py
+
+# Python
 __pycache__/
-/cookbook.pyw
-/graphalama/cookbook.pyw
+
+# Personal stuff / experiments
+dd*
+
+# Building stuff
+.eggs/
+/build/
+dist/
+/graphalama.egg-info/

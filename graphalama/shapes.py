@@ -13,9 +13,9 @@ from math import pi
 
 import pygame.examples.fonty
 
-from constants import DEFAULT
-from draw import roundrect, polygon
-from maths import clamp
+from .constants import DEFAULT
+from .draw import roundrect, polygon
+from .maths import clamp
 
 INSIDE = (255, 255, 255, 255)
 OUTSIDE = (255, 255, 255, 0)

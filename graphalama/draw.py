@@ -10,7 +10,7 @@ from pygame import gfxdraw
 from pygame.constants import SRCALPHA, BLEND_RGBA_MAX, BLEND_RGBA_MIN
 from pygame.math import Vector2
 
-from constants import BLACK
+from .constants import BLACK
 
 try:
     from PIL import Image, ImageFilter

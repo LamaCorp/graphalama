@@ -3,7 +3,7 @@ This module provides functions and classes to manipulate colors and grdients.
 """
 import pygame.gfxdraw
 
-from constants import WHITE, BLACK
+from .constants import WHITE, BLACK
 
 
 def bw_contrasted(color, threshold=200):

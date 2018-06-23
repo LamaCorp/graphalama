@@ -7,7 +7,7 @@ import pygame
 from .colors import Color
 from .constants import *
 from .maths import clamp
-from .shadow import NoShadow, Shadow
+from .shadow import Shadow
 from .shapes import Rectangle
 
 try:
@@ -80,7 +80,7 @@ class Widget:
     @property
     def shadow(self):
         """The shadow of the widget."""
-        return self._shadow  # type: NoShadow
+        return self._shadow  # type: Shadow
 
     @shadow.setter
     def shadow(self, value):

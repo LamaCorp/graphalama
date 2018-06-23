@@ -75,7 +75,7 @@ class Shadow:
             surf = blur(surf, self.blur)
 
         # We remove the shadow from where the widget is, so semi-transparent widget don't get shaded
-        surf.blit(base, self.bg_offset, special_flags=BLEND_RGBA_SUB)
+        surf.blit(base, self.bg_offset + widget.shape.bg_offset, special_flags=BLEND_RGBA_SUB)
         # We color the shadow's mask with the actual shadow color
         surf.fill((0, 0, 0, self.strength), None, BLEND_RGBA_MULT)
 

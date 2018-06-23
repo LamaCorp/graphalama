@@ -66,7 +66,7 @@ class MultiGradient(Gradient):
         Paint a surface with a multicolored gradient (with two or more points).
 
         Exemple for an equaly spaced blue-yellow-orange-red gradient:
-            >>> from constants import BLUE, YELLOW, ORANGE, RED
+            >>> from graphalama.constants import BLUE, YELLOW, ORANGE, RED
             >>> MultiGradient(BLUE, YELLOW, ORANGE, RED)
 
         You can also choose where the color points are. Here the orange-red part

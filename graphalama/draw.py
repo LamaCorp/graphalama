@@ -19,6 +19,35 @@ except (ImportError, ModuleNotFoundError):
 else:
     PIL = True
 
+
+def _to_pil(surf):
+    """Convert a pygame Surface into a pillow image."""
+    return Image.frombytes("RGBA", surf.get_size(), pygame.image.tostring(surf, "RGBA"))
+
+
+def _from_pil(pil):
+    """Convert a pillow image into a pygame Surface."""
+    return pygame.image.frombuffer(pil.tobytes("raw", "RGBA"), pil.size, "RGBA")
+
+
+def pillow_drawing(func):
+    """
+    Convert the first arg from a surface to a pillow image and back for the return.
+
+    If pillow isn't installed this only returns the first argument.
+    """
+
+    def inner(surf, *args, **kwargs):
+        if not PIL:
+            return surf
+
+        pillow_image = _to_pil(surf)
+        ret = func(pillow_image, *args, **kwargs)
+        return _from_pil(ret)
+
+    return inner
+
+
 def line(surf, start, end, color=BLACK, width=1):
     """Draws an antialiased line on the surface."""
 
@@ -123,6 +152,7 @@ def ring(surf, xy, r, width, color, antialiased=False):
         gfxdraw.aacircle(surf, x0, y0, r, color)
         gfxdraw.aacircle(surf, x0, y0, r2, color)
 
+
 def roundrect(surface, rect, color, rounding=5, percent=False):
     """
     Draw an antialiased round rectangle on the surface.
@@ -182,7 +212,7 @@ def circle2(surface, xy, r, color):
 
     circle = pygame.Surface([r * 3] * 2, SRCALPHA)
     pygame.draw.ellipse(circle, (0, 0, 0, 255), circle.get_rect(), 0)
-    circle = pygame.transform.smoothscale(circle, (2*r, 2*r))
+    circle = pygame.transform.smoothscale(circle, (2 * r, 2 * r))
 
     circle.fill(color, special_flags=BLEND_RGBA_MAX)
     circle.fill((255, 255, 255, alpha), special_flags=BLEND_RGBA_MIN)
@@ -203,19 +233,25 @@ def polygon(surf, points, color):
     return pygame.Rect(x, y, xm - x, ym - y)
 
 
-def blur(img: pygame.Surface, blur=2):
+@pillow_drawing
+def blur(img, blur=2):
     """
     Blur the image with a gaussian blur.
 
-    Does nothing is PIL is not available.
+    Does nothing if pillow is not available.
     """
 
-    if not PIL:
-        return img
-
-    tmp = Image.frombytes("RGBA", img.get_size(), pygame.image.tostring(img, "RGBA"))
-    tmp = tmp.filter(ImageFilter.GaussianBlur(blur))
-    return pygame.image.frombuffer(tmp.tobytes("raw", "RGBA"), tmp.size, "RGBA")
+    return img.filter(ImageFilter.GaussianBlur(blur))
 
 
-__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blur"]
+@pillow_drawing
+def greyscaled(img):
+    """
+    Return the greyscaled version of the image.
+
+    Does nothing if pillow is not available.
+    """
+    return img.convert("LA").convert("RGBA")
+
+
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blur", "greyscaled"]

@@ -2,7 +2,9 @@
 This module provides functions and classes to manipulate colors and grdients.
 """
 import pygame.gfxdraw
+from pygame.constants import BLEND_RGBA_MULT
 
+from graphalama.draw import greyscaled
 from .constants import WHITE, BLACK
 
 
@@ -35,34 +37,47 @@ def mix(color1, color2, pos=0.5):
 
 class Color:
     def __init__(self, rgb_or_rgba):
-        self._color = tuple(rgb_or_rgba)
+        self.color = tuple(rgb_or_rgba)
+
+        # post processing
+        self.shade_intensity = None
+        self.grey_scale = True
 
     def __repr__(self):
-        return "{}{}".format(type(self).__name__, self._color)
+        return "{}{}".format(type(self).__name__, self.color)
 
+    def _paint(self, surf):
+        surf.fill(self.color)
+
+    # post processing
     def paint(self, surf):
-        surf.fill(self._color)
+        self._paint(surf)
 
+        if self.shade_intensity is not None:
+            surf.fill((self.shade_intensity,) * 4, None, BLEND_RGBA_MULT)
+
+        if self.grey_scale:
+            surf.blit(greyscaled(surf), (0, 0))
 
 class Gradient(Color):
     def __init__(self, start, end, horizontal=True):
         super().__init__(start)
-        self._end = tuple(end)
-        self._horizontal = horizontal
+        self.end = tuple(end)
+        self.horizontal = horizontal
 
     def __repr__(self):
-        return "Gradient({} -> {})".format(self._color, self._end)
+        return "Gradient({} -> {})".format(self.color, self.end)
 
-    def paint(self, surf):
+    def _paint(self, surf):
         width, height = surf.get_size()
 
-        if self._horizontal:
+        if self.horizontal:
             for x in range(width):
-                color = mix(self._color, self._end, 1 - x / (width - 1))
+                color = mix(self.color, self.end, 1 - x / (width - 1))
                 pygame.gfxdraw.vline(surf, x, 0, height, color)
         else:
             for y in range(height):
-                color = mix(self._color, self._end, 1 - y / (height - 1))
+                color = mix(self.color, self.end, 1 - y / (height - 1))
                 pygame.gfxdraw.hline(surf, 0, width, y, color)
 
 
@@ -102,13 +117,13 @@ class MultiGradient(Gradient):
         # Should we add the positions too ? How ?
         return "MultiGradient({})".format(" -> ".join(map(str, self.colors)))
 
-    def paint(self, surf: pygame.Surface):
+    def _paint(self, surf: pygame.Surface):
         width, height = surf.get_size()
 
         # The idea is that we break the multi color gradient into 2-colors gradients
         # and then use the Gradient.paint method to paint them
 
-        if self._horizontal:
+        if self.horizontal:
             # beggining if the first color isn't at x=0
             surf.fill(self.colors[0], (0, 0, round(self.positions[0] * width), height))
 
@@ -122,7 +137,7 @@ class MultiGradient(Gradient):
                 self.color = start_color
                 self.end = end_color
 
-                super(MultiGradient, self).paint(surf.subsurface((start_x, 0, end_x - start_x, height)))
+                super(MultiGradient, self)._paint(surf.subsurface((start_x, 0, end_x - start_x, height)))
 
             end_pos = round(self.positions[-1] * width)
             surf.fill(self.colors[-1], (end_pos, 0, width - end_pos, height))
@@ -141,7 +156,7 @@ class MultiGradient(Gradient):
                 self.color = start_color
                 self.end = end_color
 
-                super(MultiGradient, self).paint(surf.subsurface((0, start_y, width, end_y - start_y)))
+                super(MultiGradient, self)._paint(surf.subsurface((0, start_y, width, end_y - start_y)))
 
             end_pos = round(self.positions[-1] * height)
             surf.fill(self.colors[-1], (0, end_pos, width, height - end_pos))

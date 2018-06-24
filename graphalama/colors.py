@@ -35,28 +35,34 @@ def mix(color1, color2, pos=0.5):
 
 class Color:
     def __init__(self, rgb_or_rgba):
-        self.color = tuple(rgb_or_rgba)
+        self._color = tuple(rgb_or_rgba)
+
+    def __repr__(self):
+        return "{}{}".format(type(self).__name__, self._color)
 
     def paint(self, surf):
-        surf.fill(self.color)
+        surf.fill(self._color)
 
 
 class Gradient(Color):
     def __init__(self, start, end, horizontal=True):
         super().__init__(start)
-        self.end = tuple(end)
-        self.horizontal = horizontal
+        self._end = tuple(end)
+        self._horizontal = horizontal
+
+    def __repr__(self):
+        return "Gradient({} -> {})".format(self._color, self._end)
 
     def paint(self, surf):
         width, height = surf.get_size()
 
-        if self.horizontal:
+        if self._horizontal:
             for x in range(width):
-                color = mix(self.color, self.end, 1 - x/(width-1))
+                color = mix(self._color, self._end, 1 - x / (width - 1))
                 pygame.gfxdraw.vline(surf, x, 0, height, color)
         else:
             for y in range(height):
-                color = mix(self.color, self.end, 1 - y/(height-1))
+                color = mix(self._color, self._end, 1 - y / (height - 1))
                 pygame.gfxdraw.hline(surf, 0, width, y, color)
 
 
@@ -92,15 +98,17 @@ class MultiGradient(Gradient):
             spacing = 1 / (len(colors) - 1)
             self.positions = tuple(spacing * i for i in range(len(self.colors)))
 
+    def __repr__(self):
+        # Should we add the positions too ? How ?
+        return "MultiGradient({})".format(" -> ".join(map(str, self.colors)))
+
     def paint(self, surf: pygame.Surface):
         width, height = surf.get_size()
-
-        color_index = 0
 
         # The idea is that we break the multi color gradient into 2-colors gradients
         # and then use the Gradient.paint method to paint them
 
-        if self.horizontal:
+        if self._horizontal:
             # beggining if the first color isn't at x=0
             surf.fill(self.colors[0], (0, 0, round(self.positions[0] * width), height))
 

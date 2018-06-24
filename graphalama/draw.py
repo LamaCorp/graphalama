@@ -234,7 +234,7 @@ def polygon(surf, points, color):
 
 
 @pillow_drawing
-def blur(img, blur=2):
+def blured(img, blur=2):
     """
     Blur the image with a gaussian blur.
 
@@ -251,7 +251,8 @@ def greyscaled(img):
 
     Does nothing if pillow is not available.
     """
+
     return img.convert("LA").convert("RGBA")
 
 
-__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blur", "greyscaled"]
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blured", "greyscaled"]

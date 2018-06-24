@@ -8,7 +8,7 @@ from collections import namedtuple
 from pygame.constants import SRCALPHA, BLEND_RGBA_MULT, BLEND_RGBA_SUB
 from pygame.surface import Surface
 
-from .draw import blur
+from .draw import blured
 from .maths import Pos
 
 Offset = namedtuple("Offset", "top left bottom right")
@@ -72,7 +72,7 @@ class Shadow:
         surf.blit(base, self.bg_offset + (self.dx, self.dy))
 
         if self.blur:
-            surf = blur(surf, self.blur)
+            surf = blured(surf, self.blur)
 
         # We remove the shadow from where the widget is, so semi-transparent widget don't get shaded
         surf.blit(base, self.bg_offset + widget.shape.bg_offset, special_flags=BLEND_RGBA_SUB)

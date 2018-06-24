@@ -3,7 +3,9 @@ In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
 import pygame
+from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP
 
+from graphalama.maths import Pos
 from .colors import Color
 from .constants import *
 from .maths import clamp
@@ -60,6 +62,11 @@ class Widget:
 
         self.visible = True
 
+        # input stuff
+        self.mouse_over = False
+        self.clicked = False
+        self.focus = False
+
     @property
     def child(self):
         return self._child
@@ -100,11 +107,70 @@ class Widget:
 
     # Inputs
 
-    def __contains__(self, point):
-        return self.shape.is_inside(point)
-
     def update(self, event):
-        pass
+        if event.type in (MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION):
+
+            rel_pos = event.pos - self.absolute_topleft
+            inside = self.shape.is_inside(rel_pos)
+
+            if event.type == MOUSEMOTION:
+                if inside and not self.mouse_over:  # Enter
+                    self.mouse_over = True
+                    self.on_mouse_enter(event)
+                    self.on_mouse_move(event)
+                elif inside:  # Moving inside
+                    self.on_mouse_move(event)
+                elif not inside and self.mouse_over:  # Exit
+                    self.mouse_over = False
+                    self.clicked = False
+                    self.on_mouse_exit(event)
+
+            elif event.type == MOUSEBUTTONDOWN:
+                if inside:
+                    self.clicked = True
+                    self.on_mouse_button_down(event)
+                else:
+                    self.clicked = False
+                    self.focus = False
+
+            elif event.type == MOUSEBUTTONUP:
+                if inside and self.clicked:
+                    self.focus = True
+                    self.on_click(event)
+                    self.on_mouse_button_up(event)
+                elif inside:
+                    self.on_mouse_button_up(event)
+                self.clicked = False
+
+        elif self.focus and event.type in (KEYDOWN, KEYUP):
+            if event.type == KEYDOWN:
+                self.on_key_press(event)
+            else:
+                self.on_key_release(event)
+
+    def on_click(self, event):
+        """Called after the user clicked and released a mouse button over the widget."""
+
+    def on_mouse_enter(self, event):
+        """Called the mouse enters the widget."""
+
+    def on_mouse_exit(self, event):
+        """Called the mouse exits the widget."""
+
+    def on_mouse_move(self, event):
+        """Called the mouse moves inside the widget."""
+
+    def on_mouse_button_down(self, event):
+        """Called user press a button of the mouse over the widget."""
+
+    def on_mouse_button_up(self, event):
+        """Called user releases a button of the mouse over the widget."""
+
+    def on_key_press(self, event):
+        """Called when a key is pressed and the widget has focus."""
+
+    def on_key_release(self, event):
+        """Called when a key is released and the widget has focus."""
 
     # Drawing methods
 
@@ -142,8 +208,16 @@ class Widget:
 
         screen.blit(self.widget_image, self.blit_pos)
 
+    def pre_draw_update(self):
+        """
+        Update drawing parameters before drawing.
+        This method is meant to be overridden.
+        """
+
     def draw(self):
         """Draw the whole widget on its ._img"""
+
+        self.pre_draw_update()
 
         # create the surface
         img = pygame.Surface(self.blit_size, flags=pygame.SRCALPHA)
@@ -167,9 +241,6 @@ class Widget:
 
         To redraw it, use .invalidate_bg() first.
         """
-
-        if self._bg:
-            return
 
         # And create the background
         bg = pygame.Surface(self.shape.size, pygame.SRCALPHA)
@@ -305,8 +376,8 @@ class Widget:
         if self.parent:
             par_tl = self.parent.absolute_topleft
             pitl = self.parent.shape.content_rect().topleft
-            return (par_tl[0] + pitl[0] + self.x,
-                    par_tl[1] + pitl[1] + self.y)
+            return Pos(par_tl[0] + pitl[0] + self.x,
+                       par_tl[1] + pitl[1] + self.y)
         else:
             return self.topleft
 
@@ -338,12 +409,12 @@ class Widget:
 
     @property
     def topleft(self):
-        return self.x, self.y
+        return Pos(self.x, self.y)
 
     @property
     def blit_pos(self):
-        return (self.x - self.shadow.offset.left,
-                self.y - self.shadow.offset.top)
+        return Pos(self.x - self.shadow.offset.left,
+                   self.y - self.shadow.offset.top)
 
     @property
     def blit_size(self):

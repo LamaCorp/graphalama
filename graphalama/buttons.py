@@ -19,64 +19,31 @@ class Button(Widget):
         self.child = content
         self.function = function
 
-        self._clicked = False
-        self._hovered = False
-        self.clicked = False
-        self.hovered = False
+    def on_mouse_enter(self, event):
+        self.invalidate_bg()
 
-    @property
-    def clicked(self):
-        return self._clicked
+    def on_mouse_button_down(self, event):
+        self.invalidate_bg()
 
-    @clicked.setter
-    def clicked(self, value):
-        if self._clicked != value:
-            self._clicked = value
-            self.invalidate_bg()
+    def on_click(self, event):
+        start_new_thread(self.function, ())
 
-        self.shape.bg_offset = (1, 1) if self._clicked else (0, 0)
+    def on_mouse_button_up(self, event):
+        self.invalidate_bg()
 
-    @property
-    def hovered(self):
-        return self._hovered
+    def on_mouse_exit(self, event):
+        self.invalidate_bg()
 
-    @hovered.setter
-    def hovered(self, value):
-        if self._hovered != value:
-            self._hovered = value
-            self.invalidate_bg()
-
-    def update(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-
-            if event.button == 1 and self.absolute_rect.collidepoint(*event.pos):
-                self.clicked = True
-                return True
-            else:
-                self.clicked = False
-
-        elif event.type == pygame.MOUSEBUTTONUP:
-
-            if self.clicked and event.button == 1 and self.absolute_rect.collidepoint(*event.pos):
-                start_new_thread(self.function, ())
-                self.clicked = False
-                return True
-            self.clicked = False
-
-        elif event.type == pygame.MOUSEMOTION:
-            self.hovered = self.absolute_rect.collidepoint(*event.pos)
-            return False  # allow other to handle the motion if user is sliding a bar etc.
-        return False
+    def pre_draw_update(self):
+        self.shape.bg_offset = (1, 1) if self.clicked else (0, 0)
 
     def draw_background(self):
-        if self._bg:
-            return
 
         super().draw_background()
 
         if self.clicked:
             shade = (222,) * 3
-        elif self.hovered:
+        elif self.mouse_over:
             shade = (242,) * 3
         else:
             return

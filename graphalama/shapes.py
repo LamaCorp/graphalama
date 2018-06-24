@@ -113,14 +113,14 @@ class Rectangle:
                            (s[0] - 2*self.border,
                             s[1] - 2*self.border))
 
-    def is_inside(self, point):
+    def is_inside(self, relative_point):
         """
         Return true if the point is inside the shape.
 
         The coordinate of the point are relative of the topleft of the shape (topleft = (0, 0))
         """
 
-        return 0 < point[0] < self.width and 0 < point[1] < self.height
+        return bool(0 < relative_point[0] < self.width and 0 < relative_point[1] < self.height)
 
 
 class RoundedRect(Rectangle):
@@ -158,9 +158,6 @@ class RoundedRect(Rectangle):
                            delta + self.bg_offset[1],
                            self.size[0] - 2 * delta,
                            self.size[1] - 2 * delta)
-
-    def is_inside(self, point):
-        super(RoundedRect, self).is_inside(point)
 
 
 class Circle(RoundedRect):
@@ -214,9 +211,3 @@ class PolarCurve(Rectangle):
             pts[i] = (int((x - minix) / (maxix - minix) * self.size[0]),
                       int((y - miniy) / (maxiy - miniy) * self.size[1]))
         return pts
-
-    def content_rect(self):
-        return super().content_rect()
-
-    def is_inside(self, point):
-        return super().is_inside(point)

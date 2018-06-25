@@ -3,7 +3,7 @@ In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
 import pygame
-from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP
+from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP, BLEND_RGBA_MIN
 
 from graphalama.maths import Pos
 from .colors import Color
@@ -203,10 +203,10 @@ class Widget:
         return self._img
 
     def render(self, screen):
-        if not self.visible:
-            return
+        self.pre_draw_update()
 
-        screen.blit(self.widget_image, self.blit_pos)
+        if self.visible:
+            screen.blit(self.widget_image, self.blit_pos)
 
     def pre_draw_update(self):
         """
@@ -216,8 +216,6 @@ class Widget:
 
     def draw(self):
         """Draw the whole widget on its ._img"""
-
-        self.pre_draw_update()
 
         # create the surface
         img = pygame.Surface(self.blit_size, flags=pygame.SRCALPHA)

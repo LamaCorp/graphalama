@@ -1,7 +1,5 @@
 from _dummy_thread import start_new_thread
 
-import pygame
-
 from .constants import BLACK, ALLANCHOR
 from .core import Widget
 from .text import SimpleText
@@ -35,19 +33,7 @@ class Button(Widget):
         self.invalidate_bg()
 
     def pre_draw_update(self):
+        super(Button, self).pre_draw_update()
+
         self.shape.bg_offset = (1, 1) if self.clicked else (0, 0)
-
-    def draw_background(self):
-
-        super().draw_background()
-
-        if self.clicked:
-            shade = (222,) * 3
-        elif self.mouse_over:
-            shade = (242,) * 3
-        else:
-            return
-
-        shade_img = pygame.Surface(self.size)
-        shade_img.fill(shade)
-        self._bg.blit(shade_img, self.shape.bg_offset, None, pygame.BLEND_RGBA_MULT)
+        self.bg_color.shade_intensity = 222 if self.clicked else 242 if self.mouse_over else None

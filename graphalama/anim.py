@@ -1,5 +1,7 @@
 from time import time
 
+from graphalama.maths import Pos
+
 
 class Anim:
     """
@@ -23,6 +25,10 @@ class Anim:
 
     def function(self, widget):
         """Override this function to provide the animation."""
+
+    @property
+    def progress(self):
+        return self.step / self.__max_steps
 
     def run(self, widget):
         """Performs one frame of the animation, if the time has come."""
@@ -87,3 +93,18 @@ class FadeAnim(Anim):
             fade = self.fade_start + self.step
 
         widget.transparency = fade
+
+
+class MoveAnim(Anim):
+    """Smoothly moves a widget from a place to another."""
+
+    def __init__(self, duration, offset, loop=False):
+        super().__init__(duration, max(map(abs, offset)), loop)
+        self.offset = Pos(offset)
+        self.start_pos = None
+
+    def function(self, widget):
+        if self.start_pos is None:
+            self.start_pos = widget.pos
+
+        widget.pos = self.start_pos + self.offset * self.progress

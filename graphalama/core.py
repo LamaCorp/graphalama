@@ -2,10 +2,12 @@
 In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
+from typing import List
 
 import pygame
 from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP, BLEND_RGBA_MIN
 
+from graphalama.anim import Anim
 from graphalama.colors import to_color
 from graphalama.maths import Pos
 from .colors import Color
@@ -61,7 +63,7 @@ class Widget:
         self.clicked = False
         self.focus = False
 
-        self.animations = []
+        self.animations = []  # type: List[Anim]
 
     # Parts of the widget
 
@@ -149,6 +151,7 @@ class Widget:
 
     def animate(self, animation):
         self.animations.append(animation)
+        animation.start()
 
     def update(self, event):
         if event.type in (MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION):
@@ -257,7 +260,7 @@ class Widget:
         """
 
         for anim in self.animations:
-            if anim.finished:
+            if not anim.running:
                 self.animations.remove(anim)
             else:
                 anim.run(self)

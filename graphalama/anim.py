@@ -3,6 +3,21 @@ from time import time
 from graphalama.maths import Pos
 
 
+# noinspection PyPep8
+class Timing:
+    """
+    This class defines a few timing functions used for animations.
+
+    A timing function goes from [0, 1] to [0, 1] and describe the progress of an animation.
+    """
+
+    linear = lambda x: x
+    slow_in = lambda x: x ** 2
+    slow_out = lambda x: 1 - (1 - x) ** 2
+    slow_in_and_out = lambda x: 2 * x ** 2 if x < 0.5 else 1 - 2 * (1 - x) ** 2
+    slow_middle = lambda x: 2 * x * (1 - x) if x < 0.5 else 1 - (2 * x * (1 - x))
+
+
 class Anim:
     """
     Base class for all animations.
@@ -11,15 +26,16 @@ class Anim:
     `function` is the action performed every time the animation runs.
     """
 
-    def __init__(self, duration=1, steps=255, loop=False):
+    def __init__(self, duration=1, steps=255, iterations=1, timing_function=Timing.slow_in_and_out):
         self.__duration = duration
         self.__max_steps = steps
         self.__first_run = time()
+        self.__timing_function = timing_function
 
-        self.__loop = loop
+        self.__iterations = iterations
         self.__reversed = False
 
-        self.finished = False
+        self.running = False
         self.step = 0
         """Current step of the animation. Ranges from 0 to self.__max_steps"""
 
@@ -30,15 +46,23 @@ class Anim:
     def progress(self):
         return self.step / self.__max_steps
 
+    @property
+    def step(self):
+        return round(self.__timing_function(self._step / self.__max_steps) * self.__max_steps)
+
+    @step.setter
+    def step(self, value):
+        self._step = value
+
     def run(self, widget):
         """Performs one frame of the animation, if the time has come."""
 
         now = time()
 
         if now > self.__first_run + self.__duration:
-            self.finished = True
+            self.running = False
 
-        if self.finished:
+        if not self.running:
             self._on_finish(widget)
             return
 
@@ -48,41 +72,45 @@ class Anim:
 
         if not self.__reversed:
 
-            if step > self.step:
-                self.step = step
+            if step > self._step:
+                self._step = step
                 self.function(widget)
 
         else:
             step = self.__max_steps - step
-            if step < self.step:  # when reversed whe want the step to decrease
-                self.step = step
+            if step < self._step:  # when reversed whe want the step to decrease
+                self._step = step
                 self.function(widget)
 
     def _on_finish(self, widget):
         """Cleanly end the animation, or loops if looping enabled."""
-        if self.__loop:
-            self.__reversed = not self.__reversed
-            self.finished = False
-            self.__first_run = time()
-        else:
-            self.step = self.__max_steps
+
+        if self.__iterations in (0, 1):  # that's  the end
             self.function(widget)
-            self.finished = True
+            self.stop()
+
+        else:
+            self.__iterations -= 1
+            self.__reversed = not self.__reversed
+            self.start()
+
+    def start(self):
+        self.running = True
+        self.__first_run = time()
 
     def stop(self):
         """Stop the inimation."""
-        self.__loop = False
-        self.finished = True
+        self.running = False
 
 
 class FadeAnim(Anim):
     """Smoothly change the trasparency of a widget."""
 
-    def __init__(self, duration, fade_start=255, fade_end=0, loop=False):
+    def __init__(self, duration, fade_start=255, fade_end=0, iterations=False, timing_function=Timing.slow_in_and_out):
         assert 0 <= fade_start <= 255
         assert 0 <= fade_start <= 255
 
-        super().__init__(duration, abs(fade_start - fade_end), loop)
+        super().__init__(duration, abs(fade_start - fade_end), iterations, timing_function)
         self.fade_start = fade_start
         self.fade_end = fade_end
 
@@ -98,8 +126,8 @@ class FadeAnim(Anim):
 class MoveAnim(Anim):
     """Smoothly moves a widget from a place to another."""
 
-    def __init__(self, duration, offset, loop=False):
-        super().__init__(duration, max(map(abs, offset)), loop)
+    def __init__(self, duration, offset, iterations=False, timing_function=Timing.slow_in_and_out):
+        super().__init__(duration, max(map(abs, offset)), iterations, timing_function)
         self.offset = Pos(offset)
         self.start_pos = None
 

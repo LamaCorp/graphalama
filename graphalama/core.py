@@ -2,9 +2,11 @@
 In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
+
 import pygame
 from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP, BLEND_RGBA_MIN
 
+from graphalama.colors import to_color
 from graphalama.maths import Pos
 from .colors import Color
 from .constants import *
@@ -31,23 +33,19 @@ class Widget:
         :param anchor: The sides where the widget will be anchored: BOTTOM|RIGHT
         """
 
-        if isinstance(shape, tuple):
-            shape = Rectangle(shape)
-        if not isinstance(color, Color):
-            color = Color(color) if color else Color(BLACK)
-        if not isinstance(bg_color, Color):
-            bg_color = Color(bg_color) if bg_color else Color(LLAMA)
-        if not isinstance(border_color, Color):
-            border_color = Color(border_color) if border_color else Color(GREY)
+        self._shadow_img = None  # type: pygame.SurfaceType
+        self._img = None  # type: pygame.SurfaceType
+        self._bg = None  # type: pygame.SurfaceType
+        self._content = None  # type: pygame.SurfaceType
 
         self._child = None  # type: Widget
         self.child = None  # type: Widget
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
-        self.color = color  # type: Color
-        self.bg_color = bg_color  # type: Color
-        self.border_color = border_color  # type: Color
+        self.color = color if color else BLACK  # type: Color
+        self.bg_color = bg_color if bg_color else LLAMA  # type: Color
+        self.border_color = border_color if border_color else GREY  # type: Color
         self.transparency = None
 
         self.pos = pos
@@ -55,11 +53,6 @@ class Widget:
 
         self.shadow = shadow if shadow else Shadow()  # type: Shadow
         self.shape = shape  # type: Rectangle
-
-        self._shadow_img = None  # type: pygame.SurfaceType
-        self._img = None  # type: pygame.SurfaceType
-        self._bg = None  # type: pygame.SurfaceType
-        self._content = None  # type: pygame.SurfaceType
 
         self.visible = True
 
@@ -69,9 +62,6 @@ class Widget:
         self.focus = False
 
         self.animations = []
-
-    def animate(self, animation):
-        self.animations.append(animation)
 
     # Parts of the widget
 
@@ -104,16 +94,61 @@ class Widget:
 
     @property
     def shape(self):
-        """The global geometrical shape of the widget, where it's clickable, its border..."""
         return self._shape
 
     @shape.setter
     def shape(self, value):
-        self._shape = value
-        self.shape.widget = self
+        if isinstance(value, Rectangle):
+            self._shape = value
+        else:
+            self._shape = Rectangle(value)
+
+        self._shape.widget = self
         self.invalidate()
 
-    # Inputs
+    # Propeties
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        self._color = to_color(value)
+        self.invalidate_content()
+
+    @property
+    def bg_color(self):
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, value):
+        self._bg_color = to_color(value)
+        self.invalidate_bg()
+
+    @property
+    def border_color(self):
+        return self._border_color
+
+    @border_color.setter
+    def border_color(self, value):
+        self._border_color = to_color(value)
+        self.invalidate_bg()
+
+    @property
+    def transparency(self):
+        return self._transparency
+
+    @transparency.setter
+    def transparency(self, value):
+        assert value is None or 0 <= value <= 255
+        self._transparency = value
+        self.invalidate()
+
+    # Inputs / update
+
+    def animate(self, animation):
+        self.animations.append(animation)
 
     def update(self, event):
         if event.type in (MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION):

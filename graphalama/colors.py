@@ -35,6 +35,13 @@ def mix(color1, color2, pos=0.5):
     return int(red), int(green), int(blue), int(alpha)
 
 
+def to_color(maybe_color):
+    if isinstance(maybe_color, Color):
+        return maybe_color
+    else:
+        return Color(maybe_color)
+
+
 class Color:
     def __init__(self, rgb_or_rgba):
         self.color = tuple(rgb_or_rgba)

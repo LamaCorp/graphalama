@@ -45,9 +45,10 @@ class Widget:
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
-        self.color = color
-        self.bg_color = bg_color
-        self.border_color = border_color
+        self.color = color  # type: Color
+        self.bg_color = bg_color  # type: Color
+        self.border_color = border_color  # type: Color
+        self.transparency = None
 
         self.pos = pos
         self.anchor = anchor if anchor is not None else TOPLEFT
@@ -66,6 +67,13 @@ class Widget:
         self.mouse_over = False
         self.clicked = False
         self.focus = False
+
+        self.animations = []
+
+    def animate(self, animation):
+        self.animations.append(animation)
+
+    # Parts of the widget
 
     @property
     def child(self):
@@ -211,8 +219,13 @@ class Widget:
     def pre_draw_update(self):
         """
         Update drawing parameters before drawing.
-        This method is meant to be overridden.
         """
+
+        for anim in self.animations:
+            if anim.finished:
+                self.animations.remove(anim)
+            else:
+                anim.run(self)
 
     def draw(self):
         """Draw the whole widget on its ._img"""
@@ -223,6 +236,9 @@ class Widget:
             img.blit(self.shadow_image, (0, 0))
         img.blit(self.background_image, self.shape.bg_offset + self.shadow.bg_offset)
         img.blit(self.content_image, self.shape.content_rect() + self.shadow.bg_offset)
+
+        if self.transparency is not None:
+            img.fill((255, 255, 255, self.transparency), None, BLEND_RGBA_MIN)
 
         # noinspection PyArgumentList
         img.convert_alpha()

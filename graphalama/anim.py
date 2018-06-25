@@ -87,5 +87,3 @@ class FadeAnim(Anim):
             fade = self.fade_start + self.step
 
         widget.transparency = fade
-
-        widget.invalidate()

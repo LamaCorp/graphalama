@@ -14,7 +14,7 @@ class Timing:
     linear = lambda x: x
     slow_in = lambda x: x ** 2
     slow_out = lambda x: 1 - (1 - x) ** 2
-    slow_in_and_out = lambda x: 2 * x ** 2 if x < 0.5 else 1 - 2 * (1 - x) ** 2
+    slow_in_and_out = lambda x: x ** 2 * (3 - 2 * x)
     slow_middle = lambda x: 2 * x * (1 - x) if x < 0.5 else 1 - (2 * x * (1 - x))
 
 

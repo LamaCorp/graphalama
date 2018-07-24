@@ -9,6 +9,7 @@ A shape class defines two important methods:
  - `is_inside` to tell if a pixel is inside the shape.
 
 """
+from collections import namedtuple
 from math import pi
 
 import pygame.examples.fonty
@@ -20,6 +21,8 @@ from .maths import clamp
 INSIDE = (255, 255, 255, 255)
 OUTSIDE = (255, 255, 255, 0)
 HALFSQRT2 = 0.709
+
+Margins = namedtuple("Margins", ("left", "top", "right", "bottom"))
 
 
 class Rectangle:
@@ -102,16 +105,20 @@ class Rectangle:
         mask.fill(OUTSIDE, (self.border, self.border, self.width - 2 * self.border, self.height - 2 * self.border))
         return mask
 
+    @property
+    def margins(self):
+        """Return the margin between the border of the widge and the content rectangle."""
+        return Margins(self.border + max(0, self.bg_offset[0]), self.border + max(0, self.bg_offset[1]),
+                       self.border - min(0, self.bg_offset[0]), self.border - min(0, self.bg_offset[1]))
+
     def content_rect(self):
         """
         Return the rectangle inside the shape to draw content of widgets.
         """
 
-        s = self.size
-        return pygame.Rect((self.border + self.bg_offset[0],
-                            self.border + self.bg_offset[1]),
-                           (s[0] - 2*self.border,
-                            s[1] - 2*self.border))
+        return pygame.Rect((self.margins.left, self.margins.top),
+                           (self.width - self.margins.left - self.margins.right,
+                            self.height - self.margins.top - self.margins.bottom))
 
     def is_inside(self, relative_point):
         """
@@ -152,12 +159,12 @@ class RoundedRect(Rectangle):
         mask.blit(temp, (0, 0), None, pygame.BLEND_RGBA_SUB)
         return mask
 
-    def content_rect(self):
-        delta = (1 - HALFSQRT2) * self.exact_rounding + self.border
-        return pygame.Rect(delta + self.bg_offset[0],
-                           delta + self.bg_offset[1],
-                           self.size[0] - 2 * delta,
-                           self.size[1] - 2 * delta)
+    @property
+    def margins(self):
+        delta = (1 - HALFSQRT2) * self.exact_rounding
+
+        m = super().margins
+        return Margins(m.left + delta, m.top + delta, m.right + delta, m.bottom + delta)
 
 
 class Circle(RoundedRect):

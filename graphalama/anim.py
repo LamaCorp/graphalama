@@ -61,6 +61,10 @@ class Anim:
 
         if now > self.__first_run + self.__duration:
             self.running = False
+            if self.__reversed:
+                self.step = 0
+            else:
+                self.step = self.__max_steps
 
         if not self.running:
             self._on_finish(widget)

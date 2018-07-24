@@ -1,6 +1,6 @@
 from _dummy_thread import start_new_thread
 
-from .constants import BLACK, ALLANCHOR
+from .constants import ALLANCHOR
 from .core import Widget
 from .text import SimpleText
 
@@ -12,7 +12,7 @@ class Button(Widget):
 
         if isinstance(content, str):
             size = self.shape.content_rect().size
-            content = SimpleText(content, (size[0]/2, size[1]/2), size, BLACK, anchor=ALLANCHOR)
+            content = SimpleText(content, (size[0] / 2, size[1] / 2), size, color, anchor=ALLANCHOR)
 
         self.child = content
         self.function = function

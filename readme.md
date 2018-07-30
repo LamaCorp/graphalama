@@ -71,14 +71,88 @@ A widget is made of three things:
  
 Those three layers are mixed together to create the widget. To customise our widgets we can therefore easily change one of those three layers.
 
+### Common parameters
+
+First, let's have a look to the common parameters that aren't part of the shadow, shape or content.
+
+#### Position
+
+With graphalama, as with pygame a position is a couple of integers, (0, 0) being the topleft corner and `(x, y)` being the `x`-st pixel on the `y`-st line of the screen.
+Every time we'll need a position as an argument for a function it will be a tuple `(x, y)` of integers.
+
+Graphalama has a powerfull positioning system for the widgets, whose goal is to be able to design resizable applications witout more effort.
+A widget's position is defined by two elements: its coordinates `pos` and its `anchor`. The `anchor` defines where the widget is anchored, 
+that is, where it will stay when the window is resized and where it will be first put on the screen. 
+
+For instance, if the anchor ia `TOPLEFT`, the widget will always stay at the same distance of the top and the left of the screen, no matter how the window is resized.
+Its `pos` will then be the topleft corner of the widget. This is the default anchor, so we can place our widgets like we would do in most frameworks.
+
+But say, we want a widget to always stay on the right side of the screen (like a "next" button), we just need to set the anchor to `RIGHT`
+and our widget will stay at say 5 pixels from the right border even if we resize the window. Here `pos` will be the middle point on the right 
+of the widget. Here's a small drawing to explain it:  
+
+![](assets/right_anchor.png)
+This button was created in a 800x500 window with 
+
+    Button("Next ->", quit, (770, 250), RoundedRect((200, 100)), bg_color=GREEN, anchor=RIGHT)
+
+If we resize the window, it will always stay 30px from the right edge.
+
+Two conclude, there are four things to remember:
+ - We can anchor a widget to one or more side of the window by setting the anchor to `RIGHT`, `LEFT`, `TOP` and `BOTTOM`. 
+ Those constants are defined in `graphalama.constants`.
+ - We can combine the anchors with the pipe symbol, `|`, so we anchor a widget to the top right corner with `anchor=TOP|RIGHT"
+ - Not only the position, but also the size can be controled with anchors. If `anchor=LEFT|RIGHT`, the distance from the widget 
+ to both side wil stay constant. Therefore the width will stretch if the window gets bigger and shrink if the window gets smaller.
+ - The `pos` of a widget always reflect the anchor: if the anchor is `BOTTOM|RIGHT` the `pos` will be teh bottom right of the widget.
+ If it is `LEFT`, `pos` will be the midleft of the widget. However we can always get the topleft of the widget with `widget.topleft`. 
+ `widget.x` and `widget.y` also work.
+ 
+ That's everything for a very technical part, but it gets very intuitive once we get used to it and saves a lot of time. 
+ If you have any question though, you can ask them on our [slack team](https://join.slack.com/t/graphalama/shared_invite/enQtMTk5NDY0Njg4MTE1LThhNTE5YjQyODMxYzU3MDU5NTQ5MzA5Yzk1MDUzMjM0NjhlOTVlMmMzZGVhNGJkNmU1ZWQ3MzAzZTkyMmViMzQ).
+ 
+#### Color
+
+Graphalama has a great range of options for coloring widgets. No more of the common monochromatic widgets without transparency!
+
+Usually widgets have three colors:
+ - `color`, the foreground color, ie. the text of a button
+ - `bg_color`, the background color, that's how the shape is filled
+ - `border_color`, the color of the border
+ 
+Those three colors accepts different types:
+ - a RGB or RGBA tuple of integers between 0 and 255, you can find a lot of pre-defined colors in `graphalama.constants`
+ - a `Gradient` from one color to another (both can be RGB or RGBA)
+ - a `MultiGradient` to have a multicolored gradient
+ 
+![](assets/color_example.PNG)
+
+
 ### Custom Shape
+
 Let's start again with our play button: `Button("PLAY", bg_color=GREEN, function=play)`.
-The default shape is a `Rectangle`, So that's what it would look like:
+The default shape is a `Rectangle`,  So that's what it would look like:  
 ![](assets/shape_simplest.PNG)
 
-But you're not limited to rectangles, you can have a rounded rectangle, a circle or any custom shape (we'll come back on creating your custom shapes later)
+But you're not limited to rectangles, you can have a rounded rectangle, a circle 
+or even any parametric shape or any custom shape (we'll come back on creating your custom shapes later)
 
+![](assets/shapes_examples.PNG)
 
+There is quite a few things to note here. 
+First of all, if we don't precise the position of the widgets, the will just stack verticaly n the center of the screen.
+Then, we can give any shape to a widget. Every widget can have any shape, we just need to pass it as the `shape` argument in the object initalisation.
+Shapes are found in `graphalama.shapes`, they all accept the same parameters :
+ - First the `size` of the widget, if none is given the widget will just fit its content
+ - Then the argments for the specific shape, ie. the rounding of the rectangle, the equations of the parametric curve...
+ - The `border` comes next, which specifies the width of the widget's border
+ - Finally comes `min_size` and `max_size`, those are the minimum and maximum size the widget can take if the window is resized 
+ 
+ Finally, a shape object is a container for all the information about the size, border, shape. 
+ If we want to change the size of a widget at runtime, we need to set ` widget.shape.size`, `widget.shape.height` or `widget.shape.width`.
+    
+ > Therefore a shape can be set only to ONE widget. Widgets can not share references to the same shape.
+ 
 ### Custom content
 
 ### Custom shadow

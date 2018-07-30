@@ -7,7 +7,7 @@ from .font import default_font
 
 class SimpleText(Widget):
 
-    def __init__(self, text, pos, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
+    def __init__(self, text, pos=None, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
                  shadow=None, anchor=DEFAULT, text_anchor=DEFAULT):
 
         self.text_anchor = text_anchor if text_anchor is not None else CENTER

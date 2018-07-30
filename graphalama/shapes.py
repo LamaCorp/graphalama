@@ -51,7 +51,7 @@ class Rectangle:
 
         if size is DEFAULT:
             self.auto_size = True
-            size = (20, 20)  # placeholder
+            size = (5, 5)  # placeholder
         else:
             self.auto_size = False
 

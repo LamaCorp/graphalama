@@ -6,7 +6,8 @@ from .text import SimpleText
 
 
 class Button(Widget):
-    def __init__(self, content, function, pos, shape=None, color=None, bg_color=None, border_color=None, shadow=None,
+    def __init__(self, content, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
+                 shadow=None,
                  anchor=None):
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)

@@ -24,7 +24,10 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Widget:
-    def __init__(self, pos, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, shadow=DEFAULT,
+    DEFAULT_POS = 5
+
+    def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
+                 shadow=DEFAULT,
                  anchor=DEFAULT):
         """
         The base of any widget.
@@ -45,11 +48,19 @@ class Widget:
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
-        self.pos = pos
-        self.anchor = anchor if anchor is not None else TOPLEFT
-
         self.shadow = shadow if shadow else Shadow()  # type: Shadow
         self.shape = shape  # type: Rectangle
+
+        if self.shape.auto_size:
+            self.shape.size = self.get_auto_size()
+
+        if pos is DEFAULT:
+            self.pos = (pygame.display.get_surface().get_width() // 2, Widget.DEFAULT_POS)
+            self.anchor = TOP  # there is no reason for someone to set the anchor without the pos, so we do it the best we can
+            Widget.DEFAULT_POS += self.shape.height + 5
+        else:
+            self.pos = pos
+            self.anchor = anchor if anchor is not None else TOPLEFT
 
         self.visible = True
 
@@ -64,9 +75,6 @@ class Widget:
         self.focus = False
 
         self.animations = []  # type: List[Anim]
-
-        if self.shape.auto_size:
-            self.shape.size = self.get_auto_size()
 
     # Parts of the widget
 
@@ -510,7 +518,7 @@ class Widget:
         if self.child:
             return self.shape.widget_size_from_content_size(self.child.size)
         else:
-            return 100, 100
+            return 162, 100
 
 
 class WidgetList(list):

@@ -24,7 +24,7 @@ The goal of this librairy is to answer all those questions and provide the easie
 
 ## How to use
 
-Most pygame applications look like this
+Most simple pygame applications look like this
 
     import pygame
     pygame.init()
@@ -55,7 +55,7 @@ For any widget you need to have at least 3 parts in the code to implement it: cr
 Say you want to add a button in your window. A big green play button. We reduce each step to the minimun.
 
 - Creation :
-      `play_button = Button("PLAY", (200, 200), color=GREEN, function=play)`
+      `play_button = Button("PLAY", bg_color=GREEN, function=play)`
 - Input handling (clicks):
         `play_button.update(event)`
 - Rendering: `play_button.render(screen)`
@@ -72,7 +72,12 @@ A widget is made of three things:
 Those three layers are mixed together to create the widget. To customise our widgets we can therefore easily change one of those three layers.
 
 ### Custom Shape
-Let's start again with your play button: `Button("PLAY", (200, 200), color=GREEN, function=play)`. The default shape is a `RoundedRect` with very small rounding.
+Let's start again with our play button: `Button("PLAY", bg_color=GREEN, function=play)`.
+The default shape is a `Rectangle`, So that's what it would look like:
+![](assets/shape_simplest.PNG)
+
+But you're not limited to rectangles, you can have a rounded rectangle, a circle or any custom shape (we'll come back on creating your custom shapes later)
+
 
 ### Custom content
 

@@ -1,6 +1,7 @@
 from _dummy_thread import start_new_thread
 
-from graphalama.constants import TOPLEFT
+from graphalama.constants import CENTER
+from graphalama.shadow import NoShadow
 from .constants import ALLANCHOR
 from .core import Widget
 from .text import SimpleText
@@ -15,8 +16,10 @@ class Button(Widget):
 
         if isinstance(content, str):
             if self.shape.auto_size:
-                content = SimpleText(content, (0, 0), None, color)
+                content = SimpleText(content, (0, 0), None, color, anchor=CENTER, shadow=NoShadow())
                 self.shape.size = self.shape.widget_size_from_content_size(content.size)
+                cr = self.shape.content_rect()
+                content.pos = cr.width // 2, cr.height // 2
             else:
                 size = self.shape.content_rect().size
                 content = SimpleText(content, (size[0] / 2, size[1] / 2), size, color, anchor=ALLANCHOR)

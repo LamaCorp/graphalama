@@ -24,7 +24,7 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Widget:
-    DEFAULT_POS = 5
+    LAST_PLACED_WIDGET = None
 
     def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT,
@@ -55,9 +55,12 @@ class Widget:
             self.shape.size = self.get_auto_size()
 
         if pos is DEFAULT:
-            self.pos = (pygame.display.get_surface().get_width() // 2, Widget.DEFAULT_POS)
+            if Widget.LAST_PLACED_WIDGET:
+                y = Widget.LAST_PLACED_WIDGET.y + Widget.LAST_PLACED_WIDGET.shape.height + 8
+            else:
+                y = 5
+            self.pos = (pygame.display.get_surface().get_width() // 2, y)
             self.anchor = TOP  # there is no reason for someone to set the anchor without the pos, so we do it the best we can
-            Widget.DEFAULT_POS += self.shape.height + 5
         else:
             self.pos = pos
             self.anchor = anchor if anchor is not None else TOPLEFT
@@ -75,6 +78,8 @@ class Widget:
         self.focus = False
 
         self.animations = []  # type: List[Anim]
+
+        Widget.LAST_PLACED_WIDGET = self
 
     def __repr__(self):
         return "<Widget at {}>".format(self.pos)
@@ -522,7 +527,7 @@ class Widget:
         if self.child:
             return self.shape.widget_size_from_content_size(self.child.size)
         else:
-            return 162, 100
+            return 50, 35
 
 
 class WidgetList(list):

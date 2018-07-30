@@ -27,6 +27,8 @@ class Button(Widget):
         self.child = content
         self.function = function
 
+        Widget.LAST_PLACED_WIDGET = self
+
     def __repr__(self):
         return "<Button-{}>".format(self.child)
 

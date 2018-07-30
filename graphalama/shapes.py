@@ -30,7 +30,7 @@ class Rectangle:
     The base shape that represent a rectangle.
     """
 
-    def __init__(self, size, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size=DEFAULT, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
         """
         The most basic shape: a rectangle.
 
@@ -43,17 +43,23 @@ class Rectangle:
 
         self.widget = None
 
-        self.exact_width = size[0]
-        """A float giving a precise width for accurate resizing. Don't set it."""
-        self.exact_height = size[1]
-        """A float giving a precise height for accurate resizing. Don't set it."""
-        self.width, self.height = size
-
         self.border = border if border else 0
 
         self.bg_offset = (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
+
+        if size is DEFAULT:
+            self.auto_size = True
+            size = (20, 20)  # placeholder
+        else:
+            self.auto_size = False
+
+        self.exact_width = size[0]
+        """A float giving a precise width for accurate resizing. Don't set it."""
+        self.exact_height = size[1]
+        """A float giving a precise height for accurate resizing. Don't set it."""
+        self.width, self.height = size
 
     # Size, width, height
 
@@ -120,6 +126,12 @@ class Rectangle:
                            (self.width - self.margins.left - self.margins.right,
                             self.height - self.margins.top - self.margins.bottom))
 
+    def widget_size_from_content_size(self, size):
+        """Set the shape size the that the content_rect size is `size`."""
+
+        return (size[0] + self.margins.left + self.margins.right,
+                size[1] + self.margins.top + self.margins.bottom)
+
     def is_inside(self, relative_point):
         """
         Return true if the point is inside the shape.
@@ -131,7 +143,7 @@ class Rectangle:
 
 
 class RoundedRect(Rectangle):
-    def __init__(self, size, rounding=20, percent=True, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size=DEFAULT, rounding=20, percent=True, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
         super().__init__(size, border, min_size, max_size)
 
         self.percent = percent
@@ -165,6 +177,30 @@ class RoundedRect(Rectangle):
 
         m = super().margins
         return Margins(m.left + delta, m.top + delta, m.right + delta, m.bottom + delta)
+
+    def widget_size_from_content_size(self, size):
+        if self.percent:
+            m = super().margins
+            width = size[0] + m.left + m.right
+            height = size[1] + m.top + m.bottom
+
+            coeff = (1 - HALFSQRT2) * self.rounding / 100
+
+            if width < height:
+                real_width = width / (1 - coeff)
+                real_height = height + real_width * coeff
+            else:
+                real_height = height / (1 - coeff)
+                real_width = width + real_height * coeff
+
+            return real_width, real_height
+
+        else:
+            delta = (1 - HALFSQRT2) * self.rounding
+            m = super().margins
+
+            return (size[0] + 2 * delta + m.left + m.right,
+                    size[1] + 2 * delta + m.top + m.bottom)
 
 
 class Circle(RoundedRect):

@@ -24,7 +24,7 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Widget:
-    def __init__(self, pos, shape, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, shadow=DEFAULT,
+    def __init__(self, pos, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, shadow=DEFAULT,
                  anchor=DEFAULT):
         """
         The base of any widget.
@@ -64,6 +64,9 @@ class Widget:
         self.focus = False
 
         self.animations = []  # type: List[Anim]
+
+        if self.shape.auto_size:
+            self.shape.size = self.get_auto_size()
 
     # Parts of the widget
 
@@ -336,6 +339,9 @@ class Widget:
     def invalidate(self, _propagation=UP | DOWN):
         """Forces the widget to re-draw"""
 
+        if not (self._img or self._shadow_img or self._bg or self._content):
+            return
+
         if _propagation & UP and self.parent:
             self.parent.invalidate_content(UP)
         if _propagation & DOWN and self.child:
@@ -345,6 +351,9 @@ class Widget:
         self._shadow_img = None
         self._bg = None
         self._content = None
+
+        if self.shape.auto_size:
+            self.shape.size = self.get_auto_size()
 
     def invalidate_content(self, _propagation=UP | DOWN):
         """Force the widget to redraw its content."""
@@ -360,6 +369,9 @@ class Widget:
 
             if self.child:
                 self.child.invalidate()
+
+        if self.shape.auto_size:
+            self.shape.size = self.get_auto_size()
 
     def invalidate_bg(self):
         """Force the widget to redraw the background."""
@@ -491,6 +503,14 @@ class Widget:
         }
 
         return d.get(anchor, "center")
+
+    def get_auto_size(self):
+        """Get the right size for the widget to contain its contents."""
+
+        if self.child:
+            return self.shape.widget_size_from_content_size(self.child.size)
+        else:
+            return 100, 100
 
 
 class WidgetList(list):

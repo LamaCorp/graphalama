@@ -6,13 +6,18 @@ from .text import SimpleText
 
 
 class Button(Widget):
-    def __init__(self, content, function, pos, shape, color=None, bg_color=None, border_color=None, shadow=None,
+    def __init__(self, content, function, pos, shape=None, color=None, bg_color=None, border_color=None, shadow=None,
                  anchor=None):
+
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
         if isinstance(content, str):
-            size = self.shape.content_rect().size
-            content = SimpleText(content, (size[0] / 2, size[1] / 2), size, color, anchor=ALLANCHOR)
+            if self.shape.auto_size:
+                content = SimpleText(content, (0, 0), None, color)
+                self.shape.size = self.shape.widget_size_from_content_size(content.size)
+            else:
+                size = self.shape.content_rect().size
+                content = SimpleText(content, (size[0] / 2, size[1] / 2), size, color, anchor=ALLANCHOR)
 
         self.child = content
         self.function = function

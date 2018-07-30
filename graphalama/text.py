@@ -7,7 +7,7 @@ from .font import default_font
 
 class SimpleText(Widget):
 
-    def __init__(self, text, pos, shape, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
+    def __init__(self, text, pos, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
                  shadow=None, anchor=DEFAULT, text_anchor=DEFAULT):
 
         self.text_anchor = text_anchor if text_anchor is not None else CENTER
@@ -21,6 +21,9 @@ class SimpleText(Widget):
             border_color = TRANSPARENT
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
+
+    def get_auto_size(self):
+        return self.shape.widget_size_from_content_size(self.font.size(self.text))
 
     def draw_content(self):
         if self._content:

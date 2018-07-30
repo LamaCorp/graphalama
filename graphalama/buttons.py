@@ -1,5 +1,6 @@
 from _dummy_thread import start_new_thread
 
+from graphalama.constants import TOPLEFT
 from .constants import ALLANCHOR
 from .core import Widget
 from .text import SimpleText
@@ -22,6 +23,9 @@ class Button(Widget):
 
         self.child = content
         self.function = function
+
+    def __repr__(self):
+        return "<Button-{}>".format(self.child)
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()

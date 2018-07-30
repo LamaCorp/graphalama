@@ -22,6 +22,12 @@ class SimpleText(Widget):
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
+    def __repr__(self):
+        return "<SimpleText-{}>".format(self.text)
+
+    def __str__(self):
+        return self.text
+
     def get_auto_size(self):
         return self.shape.widget_size_from_content_size(self.font.size(self.text))
 

@@ -76,6 +76,9 @@ class Widget:
 
         self.animations = []  # type: List[Anim]
 
+    def __repr__(self):
+        return "<Widget at {}>".format(self.pos)
+
     # Parts of the widget
 
     @property

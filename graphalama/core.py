@@ -48,7 +48,7 @@ class Widget:
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
-        self.shadow = shadow if shadow else Shadow()  # type: Shadow
+        self.shadow = shadow if shadow is not DEFAULT else Shadow()  # type: Shadow
         self.shape = shape  # type: Rectangle
 
         if self.shape.auto_size:
@@ -400,6 +400,7 @@ class Widget:
 
     @property
     def pos(self):
+        """Position of the widget relative to the parent of the window if the widget has no parent."""
         return round(self._pos[0]), round(self._pos[1])
 
     @pos.setter

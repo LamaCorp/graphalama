@@ -45,11 +45,6 @@ class Widget:
         self.parent = None  # type: Widget
         """Do not set the parent of a widget, only set childs"""
 
-        self.color = color if color else BLACK  # type: Color
-        self.bg_color = bg_color if bg_color else LLAMA  # type: Color
-        self.border_color = border_color if border_color else GREY  # type: Color
-        self.transparency = None
-
         self.pos = pos
         self.anchor = anchor if anchor is not None else TOPLEFT
 
@@ -57,6 +52,11 @@ class Widget:
         self.shape = shape  # type: Rectangle
 
         self.visible = True
+
+        self.color = color if color else BLACK  # type: Color
+        self.bg_color = bg_color if bg_color else LLAMA  # type: Color
+        self.border_color = border_color if border_color else GREY  # type: Color
+        self.transparency = None
 
         # input stuff
         self.mouse_over = False

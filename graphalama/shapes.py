@@ -204,8 +204,26 @@ class RoundedRect(Rectangle):
 
 
 class Circle(RoundedRect):
-    def __init__(self, diameter, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
-        super().__init__((diameter, diameter), 100, True, border, min_size, max_size)
+    def __init__(self, diameter=None, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+        if diameter is None:
+            # noinspection PyTypeChecker
+            super().__init__(None, 100, True, border, min_size, max_size)
+        else:
+            super().__init__((diameter, diameter), 100, True, border, min_size, max_size)
+
+    # we always want the same width and height so we bind the height to the width
+
+    @property
+    def height(self):
+        return self.width
+
+    @height.setter
+    def height(self, value):
+        self.width = value
+
+    def widget_size_from_content_size(self, size):
+        diameter = max(size) / HALFSQRT2
+        return diameter, diameter
 
 
 class PolarCurve(Rectangle):

@@ -1,5 +1,6 @@
 import pygame
 
+from graphalama.shadow import NoShadow
 from .constants import CENTER, DEFAULT, TRANSPARENT
 from .core import Widget
 from .font import default_font
@@ -19,6 +20,8 @@ class SimpleText(Widget):
             bg_color = TRANSPARENT
         if border_color is DEFAULT:
             border_color = TRANSPARENT
+        if shadow is DEFAULT:
+            shadow = NoShadow()
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 

@@ -34,6 +34,9 @@ class Shadow:
         self.blur = blur
         self.strength = strength
 
+    def __repr__(self):
+        return "Shadow({}, {}, {}, {})".format(self.dx, self.dy, self.blur, self.strength)
+
     def __bool__(self):
         return bool((self.dx or self.dy or self.blur) and self.strength)
 

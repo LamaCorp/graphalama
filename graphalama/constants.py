@@ -47,6 +47,18 @@ MIDNIGHT_BLUE = (44, 62, 80)
 
 RAINBOW = (BLUE, GREEN, YELLOW, ORANGE, RED, PINK, PURPLE)
 
+
+class Monokai:
+    """Colors of the beautiful Monokai color theme. Acording to Sublime."""
+    YELLOW = 230, 219, 116
+    BLUE = 102, 217, 239
+    PINK = 249, 38, 114
+    PURPLE = 174, 129, 255
+    BROWN = 117, 113, 94
+    ORANGE = 253, 151, 31
+    GREEN = 166, 226, 46
+    BLACK = 39, 40, 34
+
 COLORS = (
     BLACK, WHITE, GREY, LIGHT_GREY, CONCRETE, WHITESMOKE,
     BLUE, TRUE_BLUE, TURQUOISE, NICE_BLUE, MIDNIGHT_BLUE, NAVY,

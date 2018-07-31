@@ -127,6 +127,9 @@ Those three colors accepts different types:
  
 ![](assets/color_example.PNG)
 
+You can get the code for this example [here](assets/color_example.py).
+
+
 
 ### Custom Shape
 
@@ -138,6 +141,8 @@ But you're not limited to rectangles, you can have a rounded rectangle, a circle
 or even any parametric shape or any custom shape (we'll come back on creating your custom shapes later)
 
 ![](assets/shapes_examples.PNG)
+You can get the code for this example [here](assets/shapes_example.py).
+
 
 There is quite a few things to note here. 
 First of all, if we don't precise the position of the widgets, the will just stack verticaly n the center of the screen.
@@ -155,4 +160,66 @@ Shapes are found in `graphalama.shapes`, they all accept the same parameters :
  
 ### Custom content
 
+There's gonna be some heavy work there, so I wont comment on the current system.
+
 ### Custom shadow
+
+Shadows put a highight on our widgets, by creating a deeper contrast between the widget and the background.
+Shadows are fond in `graphalama.shadows` and they are optional: you can pass `NoShadow` to any widget and...
+it won't show nor calculate any shadow. Otherwise, a shadow accepts 4 optional arguments. Here's the signature
+
+    Shadow(dx=2, dy=2, blur=2, strength=100)
+    
+The two firsts are the offset between the widget and the shadow, 
+they shift the shadow by `dx` and `dy` to the right and down respectively.
+
+Optionnaly, you can blur the shadow, for a smoother result. 
+If blur is 0 the shadow will have the same shape as the widget with the same sharp borders.
+If blur is positive, then a gaussian blur si applied to the shape. Note that this requires pillow. 
+If you don't have pillow installed, it won't blur the shadow, without raising any exception.
+
+The strength is an integer between `0` and `255`, it's how dark the shadow is.
+ 
+Here's an example from [shapes_example](assets/shapes_example.py), where the widgets are
+
+    wid = WidgetList([
+        Button("Random Shadow", change_shadow, (400, 250), RoundedRect((400, 250), 50, 1, 2),
+               bg_color=(150, 232, 230), border_color=NICE_BLUE, shadow=NoShadow(), anchor=ALLANCHOR),
+        Widget((55, 35),  RoundedRect(), bg_color=Monokai.PINK, anchor=TOP),
+        Widget((150, 35), RoundedRect(), bg_color=Monokai.BLUE,   shadow=Shadow(5, 5, 0), anchor=TOP),
+        Widget((245, 35), RoundedRect(), bg_color=Monokai.ORANGE, shadow=Shadow(-5, 5, 10, 200), anchor=TOP),
+        Widget((340, 35), RoundedRect(), bg_color=Monokai.GREEN,  shadow=Shadow(5, 5, 5), anchor=TOP),
+        Widget((435, 35), RoundedRect(), bg_color=Monokai.YELLOW, shadow=Shadow(0, 0, 10), anchor=TOP),
+        Widget((530, 35), RoundedRect(), bg_color=Monokai.PURPLE, shadow=Shadow(5, 5, 0, 200), anchor=TOP),
+        Widget((625, 35), RoundedRect(), bg_color=Monokai.BROWN,  shadow=Shadow(-2, -2, 5), anchor=TOP),
+        Widget((720, 35), RoundedRect(), bg_color=Monokai.BLACK,  shadow=Shadow(5, 20, 5), anchor=TOP),
+        SimpleText("Shadow(dx, dy, blur, strength)", (400, 490), anchor=BOTTOM)
+    ])
+    
+![](assets/shadow_example.PNG)
+    
+## Other elements
+
+### Animations
+
+### Drawings
+
+### Font
+
+There's gonna be some heavy work there, so I wont comment on the current system.
+
+## Widgets
+
+### Button
+
+### SimpleText
+
+## Tips
+
+### The `Pos` class
+
+## Creating your own stuff
+
+### Widgets
+
+### 

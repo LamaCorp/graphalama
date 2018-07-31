@@ -16,12 +16,6 @@ from .maths import clamp
 from .shadow import Shadow
 from .shapes import Rectangle
 
-try:
-    PIL = True
-    from PIL import Image, ImageFilter
-except (ImportError, ModuleNotFoundError):
-    PIL = None
-
 
 class Widget:
     LAST_PLACED_WIDGET = None
@@ -102,6 +96,8 @@ class Widget:
 
         if value:
             self.child.parent = self
+
+        self.invalidate()
 
     @property
     def shadow(self):

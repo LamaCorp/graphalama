@@ -15,22 +15,35 @@ class Button(Widget):
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
         if isinstance(content, str):
-            if self.shape.auto_size:
-                content = SimpleText(content, (0, 0), None, color, anchor=CENTER, shadow=NoShadow())
-                self.shape.size = self.shape.widget_size_from_content_size(content.size)
-                cr = self.shape.content_rect()
-                content.pos = cr.width // 2, cr.height // 2
-            else:
-                size = self.shape.content_rect().size
-                content = SimpleText(content, (size[0] / 2, size[1] / 2), size, color, anchor=ALLANCHOR)
-
-        self.child = content
+            self.text = content
+        else:
+            self.child = content
         self.function = function
 
         Widget.LAST_PLACED_WIDGET = self
 
     def __repr__(self):
         return "<Button-{}>".format(self.child)
+
+    @property
+    def text(self):
+        return NotImplemented
+
+    @text.setter
+    def text(self, value):
+
+        assert isinstance(value, str), "Button.text is only for strings, use Button.child to set a widget."
+
+        if self.shape.auto_size:
+            text = SimpleText(value, (0, 0), None, self.color, anchor=CENTER, shadow=NoShadow())
+            self.shape.size = self.shape.widget_size_from_content_size(text.size)
+            cr = self.shape.content_rect()
+            text.pos = cr.width // 2, cr.height // 2
+        else:
+            size = self.shape.content_rect().size
+            text = SimpleText(value, (size[0] / 2, size[1] / 2), size, self.color, anchor=ALLANCHOR)
+
+        self.child = text
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()

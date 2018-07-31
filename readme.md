@@ -18,37 +18,43 @@ The goal of this librairy is to answer all those questions and provide the easie
 
 ## Instalation
 
-    git clone https://gitlab.com/lama-corp/graphalama
-    cd graphalama
-    python setup.py install -U
-
+```
+git clone https://gitlab.com/lama-corp/graphalama
+cd graphalama
+python setup.py install -U
+```
+    
 ## How to use
 
 Most simple pygame applications look like this
 
-    import pygame
-    pygame.init()
+```python
+import pygame
+pygame.init()
 
-    # Setup of variables, objects...
-    stop = False
-    screen = pygame.display.get((400, 400))
+# Setup of variables, objects...
+stop = False
+screen = pygame.display.get((400, 400))
 
-    # Main loop
-    while not stop:
+# Main loop
+while not stop:
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                stop = True
-            else:
-                # Handle inputs, if the user click on some clickable places, buttons...
-                # Handle the keys pressed to move players, input text...
-                # It's the logic of the game that depends of inputs
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            stop = True
+        else:
+            # Handle inputs, if the user click on some clickable places, buttons...
+            # Handle the keys pressed to move players, input text...
+            # It's the logic of the game that depends of inputs
+            ...
 
-        # Then you have an internal logic, applying gravity, running AIs, anything that changes itself
+    # Then you have an internal logic, applying gravity, running AIs, anything that changes itself
 
-        # And finally you render everything with some more or less advanced technics
+    # And finally you render everything with some more or less advanced technics
 
-        screen.fill((255, 255, 255))
+    screen.fill((255, 255, 255))
+
+```
 
 For any widget you need to have at least 3 parts in the code to implement it: creation, handling the input, and rendering it. Some widget can have an internal logic going like clock or timer but we'll come back on that later.
 
@@ -92,10 +98,13 @@ and our widget will stay at say 5 pixels from the right border even if we resize
 of the widget. Here's a small drawing to explain it:  
 
 ![](assets/right_anchor.png)
+
 This button was created in a 800x500 window with 
 
-    Button("Next ->", quit, (770, 250), RoundedRect((200, 100)), bg_color=GREEN, anchor=RIGHT)
-
+```python
+Button("Next ->", quit, (770, 250), RoundedRect((200, 100)), bg_color=GREEN, anchor=RIGHT)
+```
+    
 If we resize the window, it will always stay 30px from the right edge.
 
 Two conclude, there are four things to remember:
@@ -141,10 +150,11 @@ But you're not limited to rectangles, you can have a rounded rectangle, a circle
 or even any parametric shape or any custom shape (we'll come back on creating your custom shapes later)
 
 ![](assets/shapes_examples.PNG)
+
 You can get the code for this example [here](assets/shapes_example.py).
 
 
-There is quite a few things to note here. 
+There are quite a few things to note here. 
 First of all, if we don't precise the position of the widgets, the will just stack verticaly n the center of the screen.
 Then, we can give any shape to a widget. Every widget can have any shape, we just need to pass it as the `shape` argument in the object initalisation.
 Shapes are found in `graphalama.shapes`, they all accept the same parameters :
@@ -168,7 +178,9 @@ Shadows put a highight on our widgets, by creating a deeper contrast between the
 Shadows are fond in `graphalama.shadows` and they are optional: you can pass `NoShadow` to any widget and...
 it won't show nor calculate any shadow. Otherwise, a shadow accepts 4 optional arguments. Here's the signature
 
-    Shadow(dx=2, dy=2, blur=2, strength=100)
+ ```python
+Shadow(dx=2, dy=2, blur=2, strength=100)
+```
     
 The two firsts are the offset between the widget and the shadow, 
 they shift the shadow by `dx` and `dy` to the right and down respectively.
@@ -182,19 +194,21 @@ The strength is an integer between `0` and `255`, it's how dark the shadow is.
  
 Here's an example from [shapes_example](assets/shapes_example.py), where the widgets are
 
-    wid = WidgetList([
-        Button("Random Shadow", change_shadow, (400, 250), RoundedRect((400, 250), 50, 1, 2),
-               bg_color=(150, 232, 230), border_color=NICE_BLUE, shadow=NoShadow(), anchor=ALLANCHOR),
-        Widget((55, 35),  RoundedRect(), bg_color=Monokai.PINK, anchor=TOP),
-        Widget((150, 35), RoundedRect(), bg_color=Monokai.BLUE,   shadow=Shadow(5, 5, 0), anchor=TOP),
-        Widget((245, 35), RoundedRect(), bg_color=Monokai.ORANGE, shadow=Shadow(-5, 5, 10, 200), anchor=TOP),
-        Widget((340, 35), RoundedRect(), bg_color=Monokai.GREEN,  shadow=Shadow(5, 5, 5), anchor=TOP),
-        Widget((435, 35), RoundedRect(), bg_color=Monokai.YELLOW, shadow=Shadow(0, 0, 10), anchor=TOP),
-        Widget((530, 35), RoundedRect(), bg_color=Monokai.PURPLE, shadow=Shadow(5, 5, 0, 200), anchor=TOP),
-        Widget((625, 35), RoundedRect(), bg_color=Monokai.BROWN,  shadow=Shadow(-2, -2, 5), anchor=TOP),
-        Widget((720, 35), RoundedRect(), bg_color=Monokai.BLACK,  shadow=Shadow(5, 20, 5), anchor=TOP),
-        SimpleText("Shadow(dx, dy, blur, strength)", (400, 490), anchor=BOTTOM)
+```python
+wid = WidgetList([
+    Button("Random Shadow", change_shadow, (400, 250), RoundedRect((400, 250), 50, 1, 2),
+           bg_color=(150, 232, 230), border_color=NICE_BLUE, shadow=NoShadow(), anchor=ALLANCHOR),
+    Widget((55, 35),  RoundedRect(), bg_color=Monokai.PINK, anchor=TOP),
+    Widget((150, 35), RoundedRect(), bg_color=Monokai.BLUE,   shadow=Shadow(5, 5, 0), anchor=TOP),
+    Widget((245, 35), RoundedRect(), bg_color=Monokai.ORANGE, shadow=Shadow(-5, 5, 10, 200), anchor=TOP),
+    Widget((340, 35), RoundedRect(), bg_color=Monokai.GREEN,  shadow=Shadow(5, 5, 5), anchor=TOP),
+    Widget((435, 35), RoundedRect(), bg_color=Monokai.YELLOW, shadow=Shadow(0, 0, 10), anchor=TOP),
+    Widget((530, 35), RoundedRect(), bg_color=Monokai.PURPLE, shadow=Shadow(5, 5, 0, 200), anchor=TOP),
+    Widget((625, 35), RoundedRect(), bg_color=Monokai.BROWN,  shadow=Shadow(-2, -2, 5), anchor=TOP),
+    Widget((720, 35), RoundedRect(), bg_color=Monokai.BLACK,  shadow=Shadow(5, 20, 5), anchor=TOP),
+    SimpleText("Shadow(dx, dy, blur, strength)", (400, 490), anchor=BOTTOM)
     ])
+```
     
 ![](assets/shadow_example.PNG)
     

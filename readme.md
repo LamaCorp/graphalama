@@ -1,4 +1,6 @@
-# Pygame GUI 2
+[Join us on slack !](https://join.slack.com/t/graphalama/shared_invite/enQtMTk5NDY0Njg4MTE1LThhNTE5YjQyODMxYzU3MDU5NTQ5MzA5Yzk1MDUzMjM0NjhlOTVlMmMzZGVhNGJkNmU1ZWQ3MzAzZTkyMmViMzQ)
+
+# Graphalama
 
 ## Aim
 

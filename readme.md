@@ -55,7 +55,6 @@ while not stop:
     # And finally you render everything with some more or less advanced technics
 
     screen.fill((255, 255, 255))
-
 ```
 
 For any widget you need to have at least 3 parts in the code to implement it: creation, handling the input, and rendering it. Some widget can have an internal logic going like clock or timer but we'll come back on that later.
@@ -68,6 +67,28 @@ Say you want to add a button in your window. A big green play button. We reduce 
         `play_button.update(event)`
 - Rendering: `play_button.render(screen)`
 
+A minimal hello world would look like this:
+```python
+import pygame
+from graphalama.widgets import *
+
+pygame.init()
+
+screen = pygame.display.set_mode((800, 500))
+
+# creation
+hello_text = SimpleText("Hello World!")
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            break
+        # a text doesn't change on input so we don't need to update it
+        
+    screen.fill((255, 255, 255))
+    hello_text.render(screen)
+    pygame.display.flip()
+```
 
 ## Customisation
 

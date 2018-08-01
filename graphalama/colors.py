@@ -54,6 +54,11 @@ class Color:
     def __repr__(self):
         return "{}{}".format(type(self).__name__, self.color)
 
+    @property
+    def has_transparency(self):
+        """Return true if the color has some transparency."""
+        return len(self.color) > 3 and self.color[3] < 255 or self.transparency
+
     def _paint(self, surf):
         surf.fill(self.color)
 
@@ -80,6 +85,10 @@ class Gradient(Color):
 
     def __repr__(self):
         return "Gradient({} -> {})".format(self.color, self.end)
+
+    @property
+    def has_transparency(self):
+        return super().has_transparency or len(self.end) > 3 and self.end[3] < 255
 
     def _paint(self, surf):
         width, height = surf.get_size()
@@ -125,6 +134,17 @@ class MultiGradient(Gradient):
             # -1 because n points define n-1 ranges
             spacing = 1 / (len(colors) - 1)
             self.positions = tuple(spacing * i for i in range(len(self.colors)))
+
+    @property
+    def has_transparency(self):
+        if self.transparency:
+            return True
+
+        for r, g, b, *a in self.colors:
+            if a and a[0] < 255:
+                return True
+
+        return False
 
     def __repr__(self):
         # Should we add the positions too ? How ?

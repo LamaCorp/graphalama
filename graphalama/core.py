@@ -162,6 +162,13 @@ class Widget:
         self._transparency = value
         self.invalidate()
 
+    @property
+    def has_transparency(self):
+        return self.color.has_transparency or \
+               self.bg_color.has_transparency or \
+               self.border_color.has_transparency or \
+               self.transparency is not None and self.transparency < 255
+
     # Inputs / update
 
     def animate(self, animation):
@@ -281,7 +288,7 @@ class Widget:
                 anim.run(self)
 
     def draw(self):
-        """Draw the whole widget on its ._img"""
+        """Draw the whole widget on its .widget_image"""
 
         # create the surface
         img = pygame.Surface(self.blit_size, flags=pygame.SRCALPHA)

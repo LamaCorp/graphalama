@@ -1,9 +1,9 @@
 import pygame
 
-from graphalama.shadow import NoShadow
 from .constants import CENTER, DEFAULT, TRANSPARENT
 from .core import Widget
 from .font import default_font
+from .shadow import NoShadow
 
 
 class SimpleText(Widget):
@@ -31,12 +31,13 @@ class SimpleText(Widget):
     def __str__(self):
         return self.text
 
-    def get_auto_size(self):
+    @property
+    def prefered_size(self):
         return self.shape.widget_size_from_content_size(self.font.size(self.text))
 
     def draw_content(self):
-        if self._content:
-            return
+
+        print(123)
 
         img = pygame.Surface(self.shape.content_rect().size, pygame.SRCALPHA)
 
@@ -56,6 +57,6 @@ class SimpleText(Widget):
 
         self._content = img
 
-
-
-
+    @property
+    def has_content(self):
+        return self.text != ""

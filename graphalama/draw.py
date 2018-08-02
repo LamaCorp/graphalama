@@ -255,4 +255,9 @@ def greyscaled(img):
     return img.convert("LA").convert("RGBA")
 
 
-__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blured", "greyscaled"]
+def make_transparent(surf: pygame.Surface, max_alpha):
+    """Make the maximum alpha value of a RGBA surface `max_alpha`."""
+    surf.fill((255, 255, 255, max_alpha), None, pygame.BLEND_RGBA_MIN)
+
+
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blured", "greyscaled", "make_transparent"]

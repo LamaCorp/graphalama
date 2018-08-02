@@ -8,22 +8,18 @@ from .text import SimpleText
 
 
 class Button(Widget):
-    def __init__(self, content, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
-                 shadow=None,
-                 anchor=None):
+    def __init__(self, text, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
+                 shadow=None, anchor=None):
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
-        if isinstance(content, str):
-            self.text = content
-        else:
-            self.child = content
+        self.text = text
         self.function = function
 
         Widget.LAST_PLACED_WIDGET = self
 
     def __repr__(self):
-        return "<Button-{}>".format(self.child)
+        return "<Button-{}>".format(self.text)
 
     @property
     def text(self):
@@ -32,7 +28,7 @@ class Button(Widget):
     @text.setter
     def text(self, value):
 
-        assert isinstance(value, str), "Button.text is only for strings, use Button.child to set a widget."
+        assert isinstance(value, str), "Button.text is only for strings"
 
         if self.shape.auto_size:
             text = SimpleText(value, (0, 0), None, self.color, anchor=CENTER, shadow=NoShadow())
@@ -43,7 +39,10 @@ class Button(Widget):
             size = self.shape.content_rect().size
             text = SimpleText(value, (size[0] / 2, size[1] / 2), size, self.color, anchor=ALLANCHOR)
 
-        self.child = text
+        text.parent = self
+
+        self.children.clear()
+        self.children.append(text)
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()
@@ -60,8 +59,8 @@ class Button(Widget):
     def on_mouse_exit(self, event):
         self.invalidate_bg()
 
-    def pre_draw_update(self):
-        super(Button, self).pre_draw_update()
+    def pre_render_update(self):
+        super(Button, self).pre_render_update()
 
         self.shape.bg_offset = (1, 1) if self.clicked else (0, 0)
         self.bg_color.shade_intensity = 222 if self.clicked else 242 if self.mouse_over else None

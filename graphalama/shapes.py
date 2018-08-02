@@ -69,9 +69,11 @@ class Rectangle:
 
     @width.setter
     def width(self, value):
+        self.last_width = self.width
         self.exact_width = value
-        if self.widget:
-            self.widget.invalidate()  # so we re-draw the img on next render
+
+        if self.widget and self.last_width != self.width:
+            self.widget.invalidate()  # so we re-draw the img on next render and reposition children
 
     @property
     def height(self):
@@ -79,9 +81,11 @@ class Rectangle:
 
     @height.setter
     def height(self, value):
+        self.last_height = self.height
         self.exact_height = value
-        if self.widget:
-            self.widget.invalidate()  # so we re-draw the img on next render
+
+        if self.widget and self.last_height != self.height:
+            self.widget.invalidate()  # so we re-draw the img on next render and reposition children
 
     @property
     def size(self):
@@ -119,7 +123,9 @@ class Rectangle:
 
     def content_rect(self):
         """
-        Return the rectangle inside the shape to draw content of widgets.
+        Return the rectangle inside the shape to draw content and children of widgets.
+        This is this availaible space to draw stuff.
+        The rectangle is positioned relatively to the topleft of its widget.
         """
 
         return pygame.Rect((self.margins.left, self.margins.top),

@@ -54,6 +54,9 @@ class Color:
     def __repr__(self):
         return "{}{}".format(type(self).__name__, self.color)
 
+    def __bool__(self):
+        return not (len(self.color) > 3 and self.color[3] == 0)
+
     @property
     def has_transparency(self):
         """Return true if the color has some transparency."""

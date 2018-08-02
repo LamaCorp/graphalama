@@ -4,6 +4,7 @@ This module provides functions and classes to manipulate colors and grdients.
 import pygame.gfxdraw
 from pygame.constants import BLEND_RGBA_MULT, BLEND_RGBA_MIN
 
+from graphalama.constants import TRANSPARENT, FIT, FILL, STRETCH
 from graphalama.draw import greyscaled
 from .constants import WHITE, BLACK
 
@@ -196,3 +197,59 @@ class MultiGradient(Gradient):
 
             end_pos = round(self.positions[-1] * height)
             surf.fill(self.colors[-1], (0, end_pos, width, height - end_pos))
+
+
+class ImageBrush(Color):
+    def __init__(self, file, mode=FIT, background=TRANSPARENT):
+        """
+        Color a surface with an image.
+
+        :param file: Path to the image
+        :param mode: One of the four constants:
+          CENTER: Center the image on the surface without changing the size.
+          FIT: Fit the image inside the surface, leaving some space on the edges
+          FILL: Fill the surface but some parts of the image may not be visible.
+          STRETCH: Stretch the image so it exactly fits the rectangle.
+        :param tuple background: color of the background if the image doesn't fill the surface
+        """
+
+        super().__init__(background)
+        self.file = file
+        self.image = pygame.image.load(file)  # type: pygame.Surface
+        self.mode = mode
+
+    def __repr__(self):
+        return "<Brush-{}>".format(self.file)
+
+    def __bool__(self):
+        return True
+
+    @property
+    def has_transparency(self):
+        return True  # I don't know of an easy way to do it
+
+    def _paint(self, surf: pygame.Surface):
+        super()._paint(surf)
+
+        surf_rect = surf.get_rect()  # type: pygame.Rect
+        img_rect = self.image.get_rect()  # type: pygame.Rect
+        image = self.image.copy()
+
+        if self.mode == FIT:
+            img_rect = img_rect.fit(surf_rect)
+        elif self.mode == FILL:
+
+            sr_fit = surf_rect.fit(img_rect)
+            wr = surf_rect.width / sr_fit.width
+            hr = surf_rect.height / sr_fit.height
+
+            ratio = max(wr, hr)
+
+            img_rect.width *= ratio
+            img_rect.height *= ratio
+        elif self.mode == STRETCH:
+            img_rect = surf_rect
+
+        img_rect.center = surf_rect.center
+        image = pygame.transform.smoothscale(image, img_rect.size)
+        surf.blit(image, img_rect.topleft)

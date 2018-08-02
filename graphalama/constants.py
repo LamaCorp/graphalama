@@ -71,3 +71,8 @@ COLORS = (
 # Propagation
 UP = 1
 DOWN = 2
+
+# Image resizing
+FIT = 1
+FILL = 2
+STRETCH = 3

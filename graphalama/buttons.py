@@ -49,12 +49,14 @@ class Button(Widget):
 
     def on_mouse_button_down(self, event):
         self.invalidate_bg()
+        self.invalidate_shadow()
 
     def on_click(self, event):
         start_new_thread(self.function, ())
 
     def on_mouse_button_up(self, event):
         self.invalidate_bg()
+        self.invalidate_shadow()
 
     def on_mouse_exit(self, event):
         self.invalidate_bg()

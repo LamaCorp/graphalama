@@ -1,7 +1,9 @@
 from _dummy_thread import start_new_thread
 
-from graphalama.constants import CENTER
+from graphalama.colors import ImageBrush, Color
+from graphalama.constants import CENTER, DEFAULT, LEFT, TRANSPARENT, WHITE
 from graphalama.shadow import NoShadow
+from graphalama.shapes import Rectangle
 from .constants import ALLANCHOR
 from .core import Widget
 from .text import SimpleText
@@ -66,3 +68,57 @@ class Button(Widget):
 
         self.shape.bg_offset = (1, 1) if self.clicked else (0, 0)
         self.bg_color.shade_intensity = 222 if self.clicked else 242 if self.mouse_over else None
+
+
+class CheckBox(Widget):
+    def __init__(self, text="", pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
+                 shadow=DEFAULT, anchor=DEFAULT):
+
+        if bg_color is DEFAULT:
+            bg_color = TRANSPARENT
+            shadow = NoShadow()
+
+        box_size = (20, 20)
+        self.box_widget = Button("", self.change_checked, (0, 0), Rectangle(box_size, 1, box_size, box_size),
+                                 border_color=color, anchor=LEFT)
+        self.text_widget = SimpleText(text, (0, 0), color=color, shadow=NoShadow(), anchor=LEFT)
+
+        super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
+
+        self.add_child(self.box_widget)
+        self.add_child(self.text_widget)
+
+        self.box_widget.pos = (self.box_widget.shadow.offset[0], self.shape.content_rect().height / 2)
+        self.text_widget.pos = (self.box_widget.shadow_rect.width + 3, self.shape.content_rect().height / 2)
+
+        self._checked = False
+        self.checked = False
+
+        Widget.LAST_PLACED_WIDGET = self
+
+    @property
+    def prefered_size(self):
+        desired = (self.box_widget.shadow_rect.width + 3 + self.text_widget.shape.width,
+                   max(self.box_widget.shadow_rect.height, self.text_widget.shape.height))
+        return self.shape.widget_size_from_content_size(desired)
+
+    @property
+    def checked(self):
+        return self._checked
+
+    @checked.setter
+    def checked(self, value):
+        assert isinstance(value, bool)
+
+        if value != self.checked:
+            self._checked = value
+
+        if self.checked:
+            self.box_widget.bg_color = ImageBrush("graphalama/assets/tick.png", CENTER)
+        else:
+            self.box_widget.bg_color = Color(WHITE)
+
+        self.box_widget.invalidate_bg()
+
+    def change_checked(self):
+        self.checked = not self.checked

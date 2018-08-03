@@ -2,7 +2,7 @@
 This module provides functions and classes to manipulate colors and grdients.
 """
 import pygame.gfxdraw
-from pygame.constants import BLEND_RGBA_MULT, BLEND_RGBA_MIN
+from pygame.constants import BLEND_RGBA_MIN, BLEND_RGB_MULT
 
 from graphalama.constants import TRANSPARENT, FIT, FILL, STRETCH
 from graphalama.draw import greyscaled
@@ -71,7 +71,7 @@ class Color:
         self._paint(surf)
 
         if self.shade_intensity is not None:
-            surf.fill((self.shade_intensity,) * 4, None, BLEND_RGBA_MULT)
+            surf.fill((self.shade_intensity,) * 3, None, BLEND_RGB_MULT)
 
         if self.grey_scale:
             surf.blit(greyscaled(surf), (0, 0))

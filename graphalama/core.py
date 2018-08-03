@@ -268,7 +268,10 @@ class Widget:
     @property  # background
     def background_image(self):
         if not self._bg:
-            self.draw_background()
+            # create the surface
+            self._bg = pygame.Surface(self.shape.size, pygame.SRCALPHA)
+            # and fill it
+            self.draw_background(self._bg)
 
             # mostly for fade in and out effects
             if self.transparency is not None:
@@ -279,32 +282,30 @@ class Widget:
 
         return self._bg  # type: pygame.SurfaceType
 
-    def draw_background(self):
+    def draw_background(self, bg_surf):
         """
         Don't call this directly.
 
         Draws the background of the widget if isn't already.
         To redraw it, use .invalidate_bg() first.
+        :param bg_surf: The surface to draw the background on
         """
 
         # And create the background
-        bg = pygame.Surface(self.shape.size, pygame.SRCALPHA)
-        self.bg_color.paint(bg)
+        self.bg_color.paint(bg_surf)
 
         # And shape it correctly
         shape = self.shape.get_mask()
-        bg.blit(shape, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        bg_surf.blit(shape, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
         # Then we draw the border if we need too
         if self.shape.border:
-            surf = pygame.Surface(bg.get_size(), pygame.SRCALPHA)
+            surf = pygame.Surface(bg_surf.get_size(), pygame.SRCALPHA)
 
             self.border_color.paint(surf)
             mask = self.shape.get_border_mask()
             surf.blit(mask, (0, 0), None, pygame.BLEND_RGBA_MULT)
-            bg.blit(surf, (0, 0))
-
-        self._bg = bg
+            bg_surf.blit(surf, (0, 0))
 
     def invalidate_bg(self):
         """Force the widget to redraw the background."""
@@ -314,7 +315,11 @@ class Widget:
     @property  # content
     def content_image(self):
         if not self._content:
-            self.draw_content()
+
+            # create the surface
+            self._content = pygame.Surface(self.content_rect.size, pygame.SRCALPHA)
+            # and fill it
+            self.draw_content(self._content)
 
             # mostly for fade in and out effects
             if self.transparency is not None:
@@ -325,14 +330,15 @@ class Widget:
 
         return self._content
 
-    def draw_content(self):
+    def draw_content(self, content_surf):
         """
         Don't call this directly.
 
-        But override it to design your widget's content
+        But override it to design your widget's content.
+        :param content_surf: The surface to draw the content on
         """
 
-        self._content = pygame.Surface(self.content_rect.size, pygame.SRCALPHA)
+        pass
 
     def invalidate_content(self):
         """Force the widget to redraw its content."""

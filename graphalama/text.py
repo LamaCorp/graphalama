@@ -35,11 +35,7 @@ class SimpleText(Widget):
     def prefered_size(self):
         return self.shape.widget_size_from_content_size(self.font.size(self.text))
 
-    def draw_content(self):
-
-        print(123)
-
-        img = pygame.Surface(self.shape.content_rect().size, pygame.SRCALPHA)
+    def draw_content(self, content_surf):
 
         fg = (255, 255, 255, 255)
         temp = self.font.render(self.text, True, fg)
@@ -48,14 +44,12 @@ class SimpleText(Widget):
         surf.blit(temp, (0, 0), None, pygame.BLEND_RGBA_MULT)
 
         # colrectly align things
-        img_rect = img.get_rect()
+        img_rect = content_surf.get_rect()
         surf_rect = surf.get_rect()
         atr_name = self.anchor_to_rect_attr(self.text_anchor)
 
         setattr(surf_rect, atr_name, getattr(img_rect, atr_name))
-        img.blit(surf, surf_rect)
-
-        self._content = img
+        content_surf.blit(surf, surf_rect)
 
     @property
     def has_content(self):

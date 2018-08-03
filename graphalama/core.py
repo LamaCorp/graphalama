@@ -45,7 +45,7 @@ class Widget:
 
         self._shadow = None
         self.shadow = shadow if shadow is not DEFAULT else Shadow()  # type: Shadow
-        self._shape = None
+        self._shape = None  # type: Rectangle
         self.shape = shape  # type: Rectangle
 
         if self.shape.auto_size:
@@ -66,14 +66,14 @@ class Widget:
 
         self.visible = True
 
-        self._color = None
+        self._color = None  # type: Color
         self.color = color if color else BLACK  # type: Color
-        self._bg_color = None
+        self._bg_color = None  # type: Color
         self.bg_color = bg_color if bg_color else LLAMA  # type: Color
-        self._border_color = None
+        self._border_color = None  # type: Color
         self.border_color = border_color if border_color else GREY  # type: Color
-        self._transparency = None
-        self.transparency = None
+        self._transparency = None  # type: int
+        self.transparency = None  # type: int
 
         # input stuff
         self.mouse_over = False
@@ -513,8 +513,7 @@ class Widget:
 
     @property
     def shadow_blit_size(self):
-        return (self.shape.width + self.shadow.extra_size[0],
-                self.shape.height + self.shadow.extra_size[1])
+        return self.size + self.shadow.extra_size
 
     @property
     def shadow_rect(self):

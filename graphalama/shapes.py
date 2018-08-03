@@ -14,6 +14,7 @@ from math import pi
 
 import pygame.examples.fonty
 
+from graphalama.maths import Pos
 from .constants import DEFAULT
 from .draw import roundrect, polygon
 from .maths import clamp
@@ -89,7 +90,7 @@ class Rectangle:
 
     @property
     def size(self):
-        return self.width, self.height
+        return Pos(self.width, self.height)
 
     @size.setter
     def size(self, value):

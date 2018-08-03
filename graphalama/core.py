@@ -49,7 +49,7 @@ class Widget:
         self.shape = shape  # type: Rectangle
 
         if self.shape.auto_size:
-            self.shape.size = self.prefered_size()
+            self.shape.size = self.prefered_size
 
         self._pos = None
         if pos is DEFAULT:
@@ -112,6 +112,12 @@ class Widget:
 
         self._shape.widget = self
         self.invalidate()
+
+    def add_child(self, child: "Widget"):
+        """Recommended way to add a child to a widget."""
+        child.parent = self
+        self.children.append(child)
+        return child
 
     # Propeties
 
@@ -195,6 +201,7 @@ class Widget:
                 if inside:
                     self.clicked = True
                     self.on_mouse_button_down(event)
+
                 else:
                     self.clicked = False
                     self.focus = False
@@ -213,6 +220,9 @@ class Widget:
                 self.on_key_press(event)
             else:
                 self.on_key_release(event)
+
+        for child in self.children:
+            child.update(event)
 
     def on_click(self, event):
         """Called after the user clicked and released a mouse button over the widget."""
@@ -378,7 +388,7 @@ class Widget:
             if not rects:
                 if self.shadow:
                     screen.blit(self.shadow_image, self.shadow_blit_pos)
-                if self.bg_color:
+                if self.bg_color or self.border_color:
                     screen.blit(self.background_image, self.background_pos)  # background and border
                 if self.has_content:
                     screen.blit(self.content_image, self.content_pos)  # widget's own content
@@ -403,7 +413,7 @@ class Widget:
 
                     if self.shadow:
                         screen.blit(self.shadow_image, self.shadow_blit_pos, inter)
-                    if self.bg_color:
+                    if self.bg_color or self.border_color:
                         screen.blit(self.background_image, self.background_pos, inter)  # background and border
                     if self.has_content:
                         screen.blit(self.content_image, self.content_pos, inter)  # widget's own content
@@ -451,6 +461,9 @@ class Widget:
 
         self.shape.size = (new_w, new_h)
         self.pos = (new_x, new_y)
+
+        if self.shape.auto_size:
+            self.size = self.prefered_size
 
         # resizing child
         if self.children:

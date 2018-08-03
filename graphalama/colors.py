@@ -253,3 +253,43 @@ class ImageBrush(Color):
         img_rect.center = surf_rect.center
         image = pygame.transform.smoothscale(image, img_rect.size)
         surf.blit(image, img_rect.topleft)
+
+
+class ImageListBrush(ImageBrush):
+    def __init__(self, *files, mode=FIT, background=TRANSPARENT):
+        """
+        Paint a surface with the image from a list. Set index to choose which image
+
+        :param files: List of path to the images. They wont be loaded unless required
+        :param mode: See ImageBrush
+        :param background: See ImageBrush
+        """
+        assert len(files), "There should be at least one image."
+        super().__init__(files[0], mode, background)
+
+        self._files = files
+        self.images = [None] * len(files)
+        self._index = 0
+        self.index = 0
+
+    @property
+    def index(self):
+        """
+        Set the image to use to paint a surface.
+
+        Don't forget to call an invalidate_* on the widget if you want it to update.
+        """
+
+        return self._index
+
+    @index.setter
+    def index(self, value):
+        self.index = value % len(self._files)
+
+    def _paint(self, surf: pygame.Surface):
+        # We load the image if it isn't
+        if not self.images[self.index]:
+            self.images[self.index] = pygame.image.load(self._files[self.index])
+
+        self.image = self.images[self.index]
+        super()._paint(surf)

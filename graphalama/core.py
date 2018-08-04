@@ -19,8 +19,10 @@ from .shapes import Rectangle
 
 
 class Widget:
+
     LAST_PLACED_WIDGET = None
-    SUSPEND_LAYOUT = False
+    ACCEPT_CLICKS = False
+    ACCEPT_KEYBOARD_INPUT = False
 
     def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT, anchor=DEFAULT):
@@ -180,6 +182,12 @@ class Widget:
         animation.start()
 
     def update(self, event):
+
+        if self.children.update(event):
+            return
+
+        event_used = False
+
         if event.type in (MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION):
 
             rel_pos = event.pos - self.absolute_topleft
@@ -197,32 +205,34 @@ class Widget:
                     self.clicked = False
                     self.on_mouse_exit(event)
 
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == MOUSEBUTTONDOWN and self.ACCEPT_CLICKS:
                 if inside:
+                    self.focus = True
                     self.clicked = True
                     self.on_mouse_button_down(event)
-
+                    event_used = True
                 else:
                     self.clicked = False
                     self.focus = False
 
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == MOUSEBUTTONUP and self.ACCEPT_CLICKS:
                 if inside and self.clicked:
                     self.focus = True
                     self.on_click(event)
                     self.on_mouse_button_up(event)
+                    event_used = True
                 elif inside:
                     self.on_mouse_button_up(event)
                 self.clicked = False
 
-        elif self.focus and event.type in (KEYDOWN, KEYUP):
+        elif self.focus and event.type in (KEYDOWN, KEYUP) and self.ACCEPT_KEYBOARD_INPUT:
             if event.type == KEYDOWN:
                 self.on_key_press(event)
             else:
                 self.on_key_release(event)
+            event_used = True
 
-        for child in self.children:
-            child.update(event)
+        return event_used
 
     def on_click(self, event):
         """Called after the user clicked and released a mouse button over the widget."""

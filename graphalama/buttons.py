@@ -63,6 +63,8 @@ class Button(Widget):
 
     def on_mouse_exit(self, event):
         self.invalidate_bg()
+        # case the user leaves the button while clicking, shadow wouldn't follow the offset
+        self.invalidate_shadow()
 
     def pre_render_update(self):
         super(Button, self).pre_render_update()

@@ -312,14 +312,15 @@ class Widget:
         """
 
         # And create the background
-        self.bg_color.paint(bg_surf)
+        if self.bg_color:
+            self.bg_color.paint(bg_surf)
 
-        # And shape it correctly
-        shape = self.shape.get_mask()
-        bg_surf.blit(shape, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            # And shape it correctly
+            shape = self.shape.get_mask()
+            bg_surf.blit(shape, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
         # Then we draw the border if we need too
-        if self.shape.border:
+        if self.shape.border and self.border_color:
             surf = pygame.Surface(bg_surf.get_size(), pygame.SRCALPHA)
 
             self.border_color.paint(surf)

@@ -56,10 +56,12 @@ class Widget:
         self._pos = None
         if pos is DEFAULT:
             if Widget.LAST_PLACED_WIDGET:
-                y = Widget.LAST_PLACED_WIDGET.y + Widget.LAST_PLACED_WIDGET.shape.height + 8
+                y = Widget.LAST_PLACED_WIDGET.shadow_rect.bottom + 3
+                x = Widget.LAST_PLACED_WIDGET.background_rect.centerx
             else:
+                x = pygame.display.get_surface().get_width() // 2
                 y = 5
-            self.pos = (pygame.display.get_surface().get_width() // 2, y)
+            self.pos = x, y
             # there is no reason for someone to set the anchor without the pos, so we do it the best we can
             self.anchor = TOP
         else:

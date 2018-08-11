@@ -84,7 +84,7 @@ class CheckBox(Widget):
             shadow = NoShadow()
 
         box_size = (20, 20)
-        self.box_widget = Button("", self.change_checked, (0, 0), Rectangle(box_size, 1, box_size, box_size),
+        self.box_widget = Button("", self.change_checked, (0, 0), Rectangle(box_size, 1, 0, box_size, box_size),
                                  border_color=color, anchor=LEFT)
         self.text_widget = SimpleText(text, (0, 0), color=color, shadow=NoShadow(), anchor=LEFT)
 

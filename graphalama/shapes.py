@@ -26,12 +26,57 @@ HALFSQRT2 = 0.709
 Margins = namedtuple("Margins", ("left", "top", "right", "bottom"))
 
 
+class Padding(namedtuple("Padding", ("left", "top", "right", "bottom"))):
+    def __new__(cls, *args):
+        # default value of 0
+        if not args:
+            args = 0, 0, 0, 0
+
+        elif len(args) == 1:
+            args = args * 4
+            # cls.left = cls.right = cls.top = cls.bottom = args[0]
+        elif len(args) == 2:
+            args = args * 2
+            # cls.left = cls.right = args[0]
+            # cls.top = cls.bottom = args[1]
+        elif len(args) == 4:
+            pass
+            # c = args
+            # cls.left = args[0]
+            # cls.right = args[1]
+            # cls.top = args[2]
+            # cls.bottom = args[3]
+        else:
+            raise TypeError("Padding accepts 0, 1, 2 or 4 arguments not {}".format(len(args)))
+
+        # noinspection PyArgumentList
+        return tuple.__new__(cls, args)
+
+    def __init__(self, *args):
+        """
+        Padding(padding) -> Padding: Every side has the same size
+        Padding(horizontal, vertical) -> Padding: left and right have the same size and top and bottom too
+        Padding(left, top, right, bottom) -> Padding: The fur sides have different sizes
+        """
+
+        # This just to stop pygame from showing "incorect number of argument" error
+        tuple.__init__(self)
+
+    @property
+    def extra_width(self):
+        return self.left + self.right
+
+    @property
+    def extra_height(self):
+        return self.top + self.bottom
+
+
 class Rectangle:
     """
     The base shape that represent a rectangle.
     """
 
-    def __init__(self, size=DEFAULT, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size=DEFAULT, border=DEFAULT, padding=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
         """
         The most basic shape: a rectangle.
 
@@ -49,6 +94,10 @@ class Rectangle:
         self.bg_offset = (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
+
+        if padding is DEFAULT:
+            padding = 0
+        self.padding = padding if isinstance(padding, Padding) else Padding(padding)
 
         if size is DEFAULT:
             self.auto_size = True
@@ -119,8 +168,10 @@ class Rectangle:
     @property
     def margins(self):
         """Return the margin between the border of the widge and the content rectangle."""
-        return Margins(self.border + max(0, self.bg_offset[0]), self.border + max(0, self.bg_offset[1]),
-                       self.border - min(0, self.bg_offset[0]), self.border - min(0, self.bg_offset[1]))
+        return Margins(self.border + self.padding.extra_height + max(0, self.bg_offset[0]),
+                       self.border + max(0, self.bg_offset[1]),
+                       self.border + self.padding.extra_width - min(0, self.bg_offset[0]),
+                       self.border - min(0, self.bg_offset[1]))
 
     def content_rect(self):
         """
@@ -150,8 +201,9 @@ class Rectangle:
 
 
 class RoundedRect(Rectangle):
-    def __init__(self, size=DEFAULT, rounding=20, percent=True, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
-        super().__init__(size, border, min_size, max_size)
+    def __init__(self, size=DEFAULT, rounding=20, percent=True, border=DEFAULT, padding=DEFAULT, min_size=DEFAULT,
+                 max_size=DEFAULT):
+        super().__init__(size, border, padding, min_size, max_size)
 
         self.percent = percent
         """If true the rounding is evalutate in purcentage of the size, otherwise in pixels."""
@@ -174,7 +226,8 @@ class RoundedRect(Rectangle):
         mask = self.get_mask()
         temp = pygame.Surface(mask.get_size(), pygame.SRCALPHA)
         temp.fill((0, 0, 0, 1))
-        roundrect(temp, temp.get_rect().inflate(-2*self.border, -2*self.border), INSIDE, self.rounding, self.percent)
+        roundrect(temp, temp.get_rect().inflate(-2 * self.border, -2 * self.border), INSIDE, self.rounding,
+                  self.percent)
         mask.blit(temp, (0, 0), None, pygame.BLEND_RGBA_SUB)
         return mask
 
@@ -211,10 +264,10 @@ class RoundedRect(Rectangle):
 
 
 class Circle(RoundedRect):
-    def __init__(self, diameter=None, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, diameter=None, border=DEFAULT, padding=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
         if diameter is None:
             # noinspection PyTypeChecker
-            super().__init__(None, 100, True, border, min_size, max_size)
+            super().__init__(None, 100, True, border, padding, min_size, max_size)
         else:
             super().__init__((diameter, diameter), 100, True, border, min_size, max_size)
 
@@ -234,12 +287,12 @@ class Circle(RoundedRect):
 
 
 class PolarCurve(Rectangle):
-    def __init__(self, size, x_of_t, y_of_t, border=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
+    def __init__(self, size, x_of_t, y_of_t, border=DEFAULT, padding=DEFAULT, min_size=DEFAULT, max_size=DEFAULT):
 
         self.x = x_of_t
         self.y = y_of_t
 
-        super().__init__(size, border, min_size, max_size)
+        super().__init__(size, border, padding, min_size, max_size)
 
     def get_mask(self):
         mask = pygame.Surface(self.size, pygame.SRCALPHA)
@@ -264,7 +317,7 @@ class PolarCurve(Rectangle):
         dist = 1
         last = pts[0]
         for i, (x, y) in enumerate(pts[1:]):
-            if (last[0] - x) ** 2 + (last[1] - y) ** 2 < 1: # dist ** 2:
+            if (last[0] - x) ** 2 + (last[1] - y) ** 2 < 1:  # dist ** 2:
                 pts.remove((x, y))
             else:
                 last = x, y

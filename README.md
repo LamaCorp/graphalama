@@ -27,7 +27,7 @@ python setup.py install -U
 ```
 Or using pip:
 ```
-pip install -e git://gitlab.com/lama-corp/graphalama.git#egg=graphalama
+pip install -e git+https://gitlab.com/lama-corp/graphalama.git#egg=graphalama
 ```
     
 ## How to use

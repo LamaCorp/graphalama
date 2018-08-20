@@ -130,3 +130,16 @@ class CheckBox(Widget):
 
     def change_checked(self):
         self.checked = not self.checked
+
+
+class ImageButton(Button):
+    
+    def __init__(self, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
+                 shadow=None, anchor=None):
+        """A button with an image instead of a text. Set color to an ImageBrush for full control on image position and size."""
+
+        super().__init__("", function, pos, shape, color, bg_color, border_color, shadow, anchor)
+
+    def draw_content(self, content_surf):
+        self.color.paint(content_surf)
+

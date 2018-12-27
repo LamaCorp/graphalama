@@ -1,5 +1,3 @@
-[Join us on slack !](https://join.slack.com/t/graphalama/shared_invite/enQtMTk5NDY0Njg4MTE1LThhNTE5YjQyODMxYzU3MDU5NTQ5MzA5Yzk1MDUzMjM0NjhlOTVlMmMzZGVhNGJkNmU1ZWQ3MzAzZTkyMmViMzQ)
-
 # Graphalama
 
 ## Aim
@@ -137,7 +135,7 @@ If we resize the window, it will always stay 30px from the right edge.
 Two conclude, there are four things to remember:
  - We can anchor a widget to one or more side of the window by setting the anchor to `RIGHT`, `LEFT`, `TOP` and `BOTTOM`.
  Those constants are defined in `graphalama.constants`.
- - We can combine the anchors with the pipe symbol, `|`, so we anchor a widget to the top right corner with `anchor=TOP|RIGHT"
+ - We can combine the anchors with the pipe symbol, `|`, so we anchor a widget to the top right corner with `anchor=TOP|RIGHT`
  - Not only the position, but also the size can be controled with anchors. If `anchor=LEFT|RIGHT`, the distance from the widget
  to both side wil stay constant. Therefore the width will stretch if the window gets bigger and shrink if the window gets smaller.
  - The `pos` of a widget always reflect the anchor: if the anchor is `BOTTOM|RIGHT` the `pos` will be teh bottom right of the widget.
@@ -145,7 +143,6 @@ Two conclude, there are four things to remember:
  `widget.x` and `widget.y` also work.
 
  That's everything for a very technical part, but it gets very intuitive once we get used to it and saves a lot of time.
- If you have any question though, you can ask them on our [slack team](https://join.slack.com/t/graphalama/shared_invite/enQtMTk5NDY0Njg4MTE1LThhNTE5YjQyODMxYzU3MDU5NTQ5MzA5Yzk1MDUzMjM0NjhlOTVlMmMzZGVhNGJkNmU1ZWQ3MzAzZTkyMmViMzQ).
 
 #### Color
 

@@ -4,8 +4,6 @@ Show the different color possibilties on buttons.
 
 # coding=utf-8
 
-import ctypes
-
 import pygame
 from pygame.constants import *
 
@@ -15,7 +13,13 @@ from graphalama.constants import ORANGE, PINK, RIGHT, LEFT, TOP, BLUE, RAINBOW, 
 from graphalama.core import WidgetList
 from graphalama.shapes import RoundedRect
 
-ctypes.windll.shcore.SetProcessDpiAwareness(2)
+
+try:
+    import ctypes
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+except AttributeError as e:
+    # This sets the DPI only on windows
+    pass
 
 WHITE = (255, 255, 255)
 pygame.init()

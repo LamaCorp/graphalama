@@ -4,7 +4,6 @@ Show the different shape possibilties on buttons.
 
 # coding=utf-8
 
-import ctypes
 from math import sin, cos
 
 import pygame
@@ -15,7 +14,12 @@ from graphalama.constants import GREEN
 from graphalama.core import WidgetList
 from graphalama.shapes import RoundedRect, Circle, PolarCurve
 
-ctypes.windll.shcore.SetProcessDpiAwareness(2)
+try:
+    import ctypes
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+except AttributeError as e:
+    # This sets the DPI only on windows
+    pass
 
 WHITE = (255, 255, 255)
 pygame.init()

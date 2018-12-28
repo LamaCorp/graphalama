@@ -38,7 +38,7 @@ class SimpleText(Widget):
     def draw_content(self, content_surf):
 
         fg = (255, 255, 255, 255)
-        temp = self.font.render(self.text, True, fg)
+        temp = self.font.render(str(self.text), True, fg)
         surf = pygame.Surface(temp.get_size(), pygame.SRCALPHA)
         self.color.paint(surf)
         surf.blit(temp, (0, 0), None, pygame.BLEND_RGBA_MULT)

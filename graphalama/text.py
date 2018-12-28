@@ -12,7 +12,7 @@ class SimpleText(Widget):
                  shadow=None, anchor=DEFAULT, text_anchor=DEFAULT):
 
         self.text_anchor = text_anchor if text_anchor is not None else CENTER
-        self.text = text
+        self._text = text
         self.font = font if font else default_font()
 
         # Better defaults for Texts
@@ -29,8 +29,19 @@ class SimpleText(Widget):
         return "<SimpleText-{}>".format(self.text)
 
     def __str__(self):
-        return self.text
+        return self.text_anchor
 
+    @property
+    def text():
+        return str(self._text)
+
+    @text.setter
+    def text(value):
+        self._text = value
+        self.shape.size = self.prefered_size
+        self.invalidate()
+
+    text = property(**text(), doc=text.__doc__)
     @property
     def prefered_size(self):
         return self.shape.widget_size_from_content_size(self.font.size(self.text))
@@ -38,7 +49,7 @@ class SimpleText(Widget):
     def draw_content(self, content_surf):
 
         fg = (255, 255, 255, 255)
-        temp = self.font.render(str(self.text), True, fg)
+        temp = self.font.render(self.text, True, fg)
         surf = pygame.Surface(temp.get_size(), pygame.SRCALPHA)
         self.color.paint(surf)
         surf.blit(temp, (0, 0), None, pygame.BLEND_RGBA_MULT)

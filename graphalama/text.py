@@ -32,16 +32,15 @@ class SimpleText(Widget):
         return self.text_anchor
 
     @property
-    def text():
+    def text(self):
         return str(self._text)
 
     @text.setter
-    def text(value):
+    def text(self,value):
         self._text = value
         self.shape.size = self.prefered_size
         self.invalidate()
 
-    text = property(**text(), doc=text.__doc__)
     @property
     def prefered_size(self):
         return self.shape.widget_size_from_content_size(self.font.size(self.text))

@@ -77,7 +77,6 @@ class Color:
             surf.blit(greyscaled(surf), (0, 0))
 
         if self.transparency is not None:
-            print(self.transparency)
             surf.fill((255, 255, 255, self.transparency), None, BLEND_RGBA_MIN)
 
 

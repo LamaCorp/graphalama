@@ -10,11 +10,12 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-long_description = ''
+with open("README.md", "r") as fh:
+        long_description = fh.read()
 
 setup(
     name='graphalama',
-    version='0.0.1',
+    version='0.0.1b',
     description='Easy to use widgets for pygame',
     long_description=long_description,
     classifiers=[

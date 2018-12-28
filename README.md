@@ -18,14 +18,15 @@ The goal of this librairy is to answer all those questions and provide the easie
 
 ## Installation
 
+You can install a stable version using pip
+```
+pip install graphalama
+```
+Or a developper version with
 ```
 git clone https://gitlab.com/lama-corp/graphalama
 cd graphalama
 python setup.py install -U
-```
-Or using pip:
-```
-pip install -e git+https://gitlab.com/lama-corp/graphalama.git#egg=graphalama
 ```
 
 ## How to use

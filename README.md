@@ -53,11 +53,12 @@ while not stop:
             # It's the logic of the game that depends of inputs
             ...
 
-    # Then you have an internal logic, applying gravity, running AIs, anything that changes itself
+    # Then you have an internal logic, applying gravity, running AIs, anything that changes itself every frame
 
     # And finally you render everything with some more or less advanced technics
 
     screen.fill((255, 255, 255))
+	pygame.display.update()
 ```
 
 For any widget you need to have at least 3 parts in the code to implement it: creation, handling the input, and rendering it. Some widget can have an internal logic going like clock or timer but we'll come back on that later.
@@ -85,7 +86,7 @@ hello_text = SimpleText("Hello World!")
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            break
+            quit()
         # a text doesn't change on input so we don't need to update it
 
     screen.fill((255, 255, 255))
@@ -95,7 +96,7 @@ while True:
 
 ## Customisation
 
-Before knowing how to cutomise your widgets so they match your style, we have to understand what is a widget.
+Before knowing how to cutomise your widgets so they match your style, we have to understand what *is* a widget.
 A widget is made of three things:
  - a **Shadow**: optional, it provides a nice depth to our application and accentuate our widgets
  - a **Shape**: defines the shape of the background. It also defines the borders, the size and where you can click/select the widget. To list a few common: Rectangle, Circle, RoundedRect...
@@ -154,17 +155,48 @@ Usually widgets have three colors:
  - `bg_color`, the background color, that's how the shape is filled
  - `border_color`, the color of the border
 
-Those three colors accepts different types:
+Those three colors accepts different types, and you can pass any of them at any time:
  - a RGB or RGBA tuple of integers between 0 and 255, you can find a lot of pre-defined colors in `graphalama.constants`
  - a `Gradient` from one color to another (both can be RGB or RGBA)
  - a `MultiGradient` to have a multicolored gradient
  - a `ImageBrush` to draw an image
  - a `ImageListBrush` to draw multiple images and swap between them.
 
-![](assets/color_example.PNG)
-
+![Example of differents colors and transparency](assets/color_example.PNG)
 You can get the code for this example [here](assets/color_example.py).
 
+What actually is a color ?
+It is an object with a `paint` method that takes a `Surface` and colorize it.
+
+##### RGB or RGBA tuples
+Tuples like `(R, G, B)` or `(R, G, B, A)` are both valid colors, with `0 <= R, G, B, A <= 255`.
+They are automatically converted to a `Color` object for ease of use. And as expected, they fill the whole area with the same color.
+
+##### Gradients
+A `Gradient(start, end, horizontal)` will fill a shape with a linear interpolation between the two colors.
+`start` and `end` must be two tuples and if `horizontal == False`, the gradient will be drawn verticall,
+so `start` will be at the top of the shape and `end` at the bottom.
+
+##### Multigradients
+    ):
+A `Multigradient(*colors, positions=None, horizontal=True)` is like a `Gradient` but with more than two colors.
+
+Example for an equaly spaced blue-yellow-orange-red gradient:
+```
+from graphalama.constants import BLUE, YELLOW, ORANGE, RED
+MultiGradient(BLUE, YELLOW, ORANGE, RED)
+```
+
+You can also choose where the color points are. Here the orange-red part
+will take the left half of the gradient whereas the blue-yellow and yellow-orange
+would take only a fourth. The positions are between 0 and
+```
+MultiGradient(BLUE, YELLOW, ORANGE, RED, positions=(0, 1/4, 1/2, 1))
+```
+Of course, the number of positions must match the number of colors, but the positions do nat have to start at 0 and
+end at 1. For instance is the positions are `(1/2, 2/3, 1)`, the first half of the surface will be exactly of the first color.
+
+If `horizontal == False`, then the gradient is drawn top to bottom and not left to right.
 
 
 ### Custom Shape

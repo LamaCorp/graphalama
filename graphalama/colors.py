@@ -81,7 +81,17 @@ class Color:
 
 
 class Gradient(Color):
-    def __init__(self, start, end, horizontal=True):
+    def __init__(self, start: tuple, end: tuple, horizontal=True):
+        """
+        Linear Gradient from the color `start` and the color `end`.
+
+        The colors are the line in the 3D or 4D cube between the two points.
+
+        :param tuple start: A RGB or RGBA tuple
+        :param tuple end: A RGB or RGBA tuple
+        :param bool horizontal: The orientation (horizontal or vertical)
+        """
+
         super().__init__(start)
         self.end = tuple(end)
         self.horizontal = horizontal
@@ -111,7 +121,7 @@ class MultiGradient(Gradient):
         """
         Paint a surface with a multicolored gradient (with two or more points).
 
-        Exemple for an equaly spaced blue-yellow-orange-red gradient:
+        Example for an equaly spaced blue-yellow-orange-red gradient:
             >>> from graphalama.constants import BLUE, YELLOW, ORANGE, RED
             >>> MultiGradient(BLUE, YELLOW, ORANGE, RED)
 

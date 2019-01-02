@@ -38,8 +38,14 @@ class SimpleText(Widget):
     @text.setter
     def text(self,value):
         self._text = value
-        self.shape.size = self.prefered_size
-        self.invalidate()
+        if self.shape.auto_size:
+            # otherwise the size would stay the same even if the text is smaller/bigger
+            self.shape.size = self.prefered_size
+            # We need to invalidate everything since the size changed => the shadow and bg too
+            self.invalidate()
+        else:
+            # Only the content has changed, not the shadow/bg
+            self.invalidate_content()
 
     @property
     def prefered_size(self):

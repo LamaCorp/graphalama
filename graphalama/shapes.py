@@ -41,7 +41,6 @@ class Padding(namedtuple("Padding", ("left", "top", "right", "bottom"))):
             # cls.top = cls.bottom = args[1]
         elif len(args) == 4:
             pass
-            # c = args
             # cls.left = args[0]
             # cls.right = args[1]
             # cls.top = args[2]
@@ -56,7 +55,7 @@ class Padding(namedtuple("Padding", ("left", "top", "right", "bottom"))):
         """
         Padding(padding) -> Padding: Every side has the same size
         Padding(horizontal, vertical) -> Padding: left and right have the same size and top and bottom too
-        Padding(left, top, right, bottom) -> Padding: The fur sides have different sizes
+        Padding(left, top, right, bottom) -> Padding: The four sides have different sizes
         """
 
         # This just to stop pygame from showing "incorect number of argument" error
@@ -64,10 +63,12 @@ class Padding(namedtuple("Padding", ("left", "top", "right", "bottom"))):
 
     @property
     def extra_width(self):
+        """Return the total horizontal padding"""
         return self.left + self.right
 
     @property
-    def extra_height(self):
+    def extra_h(self):
+        """Return the total vertical padding"""
         return self.top + self.bottom
 
 
@@ -123,7 +124,9 @@ class Rectangle:
         self.exact_width = value
 
         if self.widget and self.last_width != self.width:
-            self.widget.invalidate()  # so we re-draw the img on next render and reposition children
+            # so we re-draw the img on next render and reposition children
+            self.widget.invalidate()
+
 
     @property
     def height(self):
@@ -135,7 +138,8 @@ class Rectangle:
         self.exact_height = value
 
         if self.widget and self.last_height != self.height:
-            self.widget.invalidate()  # so we re-draw the img on next render and reposition children
+            # so we re-draw the img on next render and reposition children
+            self.widget.invalidate()
 
     @property
     def size(self):
@@ -206,7 +210,7 @@ class RoundedRect(Rectangle):
         super().__init__(size, border, padding, min_size, max_size)
 
         self.percent = percent
-        """If true the rounding is evalutate in purcentage of the size, otherwise in pixels."""
+        """If true the rounding is evalutate in percentage of the size, otherwise in pixels."""
         self.rounding = rounding
         """The amount rounded on each corner, it can be percents or pixels depending on :percent"""
 

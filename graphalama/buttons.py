@@ -1,3 +1,4 @@
+from math import pi, sin, cos
 from _dummy_thread import start_new_thread
 
 from graphalama.colors import ImageBrush, Color, to_color
@@ -8,6 +9,7 @@ from .constants import ALLANCHOR
 from .core import Widget, WidgetList
 from .text import SimpleText
 from .maths import Pos
+from .draw import line
 
 
 class Button(Widget):
@@ -140,7 +142,7 @@ class ImageButton(Button):
 class CarrouselSwitch(Button):
 
     def __init__(self, options, on_choice, pos=None, shape=None, color=None, bg_color=None, border_color=None,
-                 arrow_color=None, shadow=None, anchor=None):
+                 arrow_color=None, arrow_spacing=None, shadow=None, anchor=None):
         """
         A widget to let the user choose between multiple options.
 
@@ -148,33 +150,30 @@ class CarrouselSwitch(Button):
           Ex:   <-  OPTION 1  ->
 
         :param options: a list of string the user can choose from with the arrow
-        :param on_choice: A function call every time the user chooses a new option, with an argument, the new option.
+        :param on_choice: A function called every time the user chooses a new option, with this option as argument.
+           this function is called synchronously
         :param arrow_color: set the color of the arrows
+        :param arrow_spacing: set the space between the arrow and the text
         """
 
         arrow_color = arrow_color if arrow_color is not None else GREY
+        arrow_spacing = arrow_spacing if arrow_spacing is not None else 5
 
         self.on_choice = on_choice
         self._options = []
         self._option_index = 0
         self._arrow_color = None
+        self._arrow_spacing = 10
 
         # we set a nop function for the click as we don't utilise it
         super().__init__(options[0], lambda: 0, pos, shape, color, bg_color, border_color, shadow, anchor)
 
         cr = self.content_rect
-        self.left_arrow = self.add_child(SimpleText("<", (0, cr.height / 2), color=arrow_color, anchor=LEFT))
-        self.right_arrow = self.add_child(SimpleText(">", (cr.width, cr.height / 2), color=arrow_color, anchor=RIGHT))
-
-        self.children.remove(self.text_widget)
-        self.text_widget = self.add_child(SimpleText("",
-                                               pos=(cr.width / 2, cr.height / 2),
-                                               shape=(cr.width - self.left_arrow.size[0] - self.right_arrow.size[0], cr.height),
-                                               color=self.color,
-                                               anchor=ALLANCHOR))
-
+        self.text_widget.anchor = ALLANCHOR
+        self.text_widget.size = cr.width - 2*arrow_spacing, cr.height # self.left_arrow.size[0] - self.right_arrow.size[0], cr.height
 
         # Setting properties
+        self.arrow_spacing = arrow_spacing
         self.options = options
         self.option_index = 0
         self.arrow_color = arrow_color if arrow_color is not None else GREY
@@ -223,20 +222,25 @@ class CarrouselSwitch(Button):
     @options.setter
     def options(self, value):
         self._options = value
+        # We reset the index
         self.option_index = 0
+        # And the images
         self.invalidate_content()
+        # And resize the widget if dev didn't specify a fixed size
         if self.shape.auto_size:
             self.size = self.prefered_size
 
     @property
     def prefered_size(self):
-        if hasattr(self, "left_arrow"):
-            # this is called the first time before left_arrow is created, in super().__init__()
-            arrow_size = self.left_arrow.shape.width + self.right_arrow.shape.width
-        else:
+        if not hasattr(self, "text_widget"):
+            # this is called int the __init__ before everything is created
             # so we set a placeholer
-            return super().prefered_size
+            return 80, 35
 
+        # computing the arrow size
+        arrow_size = self.arrow_direction_vec.x + self.arrow_spacing
+
+        # calculating the maximum size for an option
         virtual_simple_text = SimpleText("")
         maxi = 0
         for option in self.options:
@@ -244,17 +248,57 @@ class CarrouselSwitch(Button):
             virtual_simple_text.text = option
             maxi = max(maxi, virtual_simple_text.prefered_size[0])
 
-        content_prefered_size = (arrow_size + maxi, self.text_widget.shape.height)
+        # adding both
+        content_prefered_size = (2*arrow_size + maxi, self.text_widget.shape.height)
         return self.shape.widget_size_from_content_size(content_prefered_size)
 
     @property
     def arrow_color(self):
         """Get and set the color for both arrow"""
-        return self.left_arrow.color
+        return self._arrow_color
 
     @arrow_color.setter
     def arrow_color(self, value):
-        self.left_arrow.color = value
-        self.right_arrow.color = value
+        self._arrow_color = value
         self.invalidate_content()
+
+    @property
+    def arrow_direction_vec(self):
+        """Return a direction to draw an arrow. It is the down-right direction."""
+        r = self.content_rect
+        angle = pi / 6
+
+        arrow_height = r.h / 2 - 6
+        # we fix the max height to 30px
+        arrow_height = min(arrow_height, 30)
+        arrow_length = arrow_height / sin(angle)
+        arrow_width = arrow_height * cos(angle)
+        direction = Pos(arrow_width, arrow_height)
+
+        return direction
+
+    @property
+    def arrow_spacing(self):
+        """Get and set the space between the arrow and the text (in pixels)."""
+        return self._arrow_spacing
+
+    @arrow_spacing.setter
+    def arrow_spacing(self, value):
+        self._arrow_spacing = value
+        if self.shape.auto_size:
+            self.size = self.prefered_size
+
+    def draw_content(self, content_surf):
+        r = content_surf.get_rect()
+        direction = self.arrow_direction_vec
+
+        # drawing the first arrow
+        left_center = Pos(r.midleft) # + (2, 0)
+        line(content_surf, left_center, left_center + direction, self.arrow_color, 2)
+        line(content_surf, left_center, left_center + (direction.x, -direction.y), self.arrow_color, 2)
+
+        # drawing the second arrow
+        right_center = Pos(r.midright) # + (-2, 0)
+        line(content_surf, right_center, right_center - direction, self.arrow_color, 2)
+        line(content_surf, right_center, right_center - (direction.x, -direction.y), self.arrow_color, 2)
 

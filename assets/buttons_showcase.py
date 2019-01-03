@@ -11,7 +11,7 @@ from pygame.constants import *
 
 from graphalama.buttons import Button, CarrouselSwitch
 from graphalama.colors import Gradient, MultiGradient
-from graphalama.constants import ORANGE, PINK, RIGHT, LEFT, TOP, BLUE, RAINBOW, BOTTOM, CENTER
+from graphalama.constants import ORANGE, PINK, RIGHT, LEFT, TOP, BLUE, RAINBOW, BOTTOM, CENTER, NICE_BLUE
 from graphalama.core import WidgetList
 from graphalama.shapes import RoundedRect
 
@@ -33,7 +33,7 @@ FPS = 60
 
 
 def new_screen():
-    return pygame.display.set_mode(SCREEN_SIZE, DOUBLEBUF | VIDEORESIZE)
+    return pygame.display.set_mode(SCREEN_SIZE)
 
 
 def gui():
@@ -46,8 +46,9 @@ def gui():
     def nop(): ...
 
     wid = WidgetList([
-        CarrouselSwitch(["Option 1", "A massive pizza", "Merry Christmas !"], lambda c: print(c), shape=RoundedRect(rounding=100), pos=(400, 250), anchor=CENTER),
-        Button("Have fun", nop),
+        CarrouselSwitch(["Option 1", "A massive pizza", "Merry Christmas !"], lambda c: print(c), shape=RoundedRect(rounding=100),
+                        pos=(400, 250), anchor=CENTER, bg_color=(240, 240, 240, 240), arrow_spacing=20),
+        Button("Have fun", lambda: setattr(wid[0], 'arrow_color', NICE_BLUE), bg_color=NICE_BLUE+(128,)),
     ])
 
     while True:

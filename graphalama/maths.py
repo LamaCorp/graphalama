@@ -2,7 +2,7 @@
 Math functions and object useful in any code.
 """
 from collections import namedtuple
-from math import sqrt
+from math import sqrt, cos, sin, pi
 
 import pygame
 
@@ -67,6 +67,9 @@ class Pos(namedtuple("Pos", ('x', 'y'))):
     def __truediv__(self, other: int):
         return Pos(self[0] / other, self[1] / other)
 
+    def __floordiv__(self, other: int):
+        return Pos(self[0] // other, self[1] // other)
+
     @property
     def t(self):
         """The vecor as a tuple"""
@@ -84,3 +87,10 @@ class Pos(namedtuple("Pos", ('x', 'y'))):
     def norm(self):
         """Return the norm of the vector"""
         return sqrt(self.squared_norm())
+
+    def rotate(self, degree):
+        c = cos(pi / 180 * degree)
+        s = sin(pi / 180 * degree)
+        return Pos(c*self[0] + s*self[1],
+                   s*self[0] - c*self[1])
+

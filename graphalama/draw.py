@@ -5,6 +5,8 @@ This is a module for easy drawings.
 Every function provides anti-aliased shapes.
 """
 
+__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blured", "greyscaled", "make_transparent"]
+
 import pygame
 from pygame import gfxdraw
 from pygame.constants import SRCALPHA, BLEND_RGBA_MAX, BLEND_RGBA_MIN
@@ -54,7 +56,12 @@ def line(surf, start, end, color=BLACK, width=1):
     width = round(width, 1)
     if width == 1:
         # return pygame.draw.aaline(surf, color, start, end)
-        return gfxdraw.line(surf, *start, *end, color)
+        start = list(map(int, start))
+        end = list(map(int, end))
+        gfxdraw.line(surf, *start, *end, color)
+        rect = pygame.Rect(*start, start[0] - end[0], start[1] - end[1])
+        rect.normalize()
+        return rect
 
     # noinspection PyArgumentList
     start = Vector2(start)
@@ -62,7 +69,7 @@ def line(surf, start, end, color=BLACK, width=1):
     end = Vector2(end)
 
     line_vector = end - start
-    half_side = line_vector.normalise().rotate(90) * width / 2
+    half_side = line_vector.normalize().rotate(90) * width / 2
 
     point1 = start + half_side
     point2 = start - half_side
@@ -259,5 +266,3 @@ def make_transparent(surf: pygame.Surface, max_alpha):
     """Make the maximum alpha value of a RGBA surface `max_alpha`."""
     surf.fill((255, 255, 255, max_alpha), None, pygame.BLEND_RGBA_MIN)
 
-
-__all__ = ['circle', 'line', 'polygon', 'ring', 'roundrect', "blured", "greyscaled", "make_transparent"]

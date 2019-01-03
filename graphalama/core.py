@@ -389,7 +389,19 @@ class Widget:
                 anim.run(self)
 
     def render(self, screen: Surface, rects: List[pygame.Rect] = ()):
+        """
+        Draw the widget and it's child into the screen.
+
+        An optional `rects` can be passed tu update only the rects. It is used for optimized rendering,
+        where we want to update only the parts of the screen that have changed during the last frame.
+        """
+
         self.pre_render_update()
+
+        # on render we blit the shadow, background, content and every child in this order.
+        # I choosed to blit everything everytime as blit operation are somewhat fast
+        # and it's a much cleaner code than is each widget was a surface containing their children
+        # (were each widget would be blited on their parents
 
         if self.visible:
 
@@ -416,7 +428,7 @@ class Widget:
                 for child in self.children:
                     if not child.has_transparency and type(child.shape) is Rectangle:
 
-                        # we don't whant to blit stuff if it will be overridden by the child who has as no transparency
+                        # we don't want to blit stuff if it will be overridden by the child who has as no transparency
                         for inter in intersections[:]:
                             if child.background_rect.contains(inter):
                                 child.render(content_surf, inter)
@@ -446,8 +458,18 @@ class Widget:
         self._pos = value
 
     def resize(self, new_screen_size, past_screen_size):
+        """
+        Resize and replace the widget according to its anchor.
+
+        You shouldn't need to call this function directly as `Widget.size.setter` and `Widget.update` do it already.
+        Call this when the window / parent widget size changes from `past_screen_size` to `new_screen_size`.
+        """
 
         past_inside_size = self.shape.content_rect().size
+
+        # The is idea is to calculate margins on each side, since that's what an anchor fixes
+        # and then deduce the new size
+        # But we all know that it is just math that happen to work
 
         new_x = self._pos[0] * new_screen_size[0] / past_screen_size[0]
         new_y = self._pos[1] * new_screen_size[1] / past_screen_size[1]
@@ -476,9 +498,9 @@ class Widget:
         self.pos = (new_x, new_y)
 
         if self.shape.auto_size:
-            self.size = self.prefered_size
+            self.shape.size = self.prefered_size
 
-        # resizing child
+        # resizing children
         if self.children:
             self.children.resize(self.shape.content_rect().size, past_inside_size)
 
@@ -501,6 +523,8 @@ class Widget:
 
     @property
     def absolute_topleft(self):
+        """Position of the topleft of the background inside the whole window."""
+
         if self.parent:
             par_tl = self.parent.absolute_topleft
             pitl = self.parent.shape.content_rect().topleft
@@ -511,10 +535,14 @@ class Widget:
 
     @property
     def absolute_rect(self):
+        """Rectangle containing the widget (its background) inside the whole window."""
+
         return pygame.Rect(self.absolute_topleft, self.size)
 
     @property
     def x(self):
+        """X position relative to its parent (or the left of the window if it has no parent)"""
+
         if self.anchor & LEFT and self.anchor & RIGHT:
             return self.pos[0] - self.shape.width // 2
         elif self.anchor & LEFT:
@@ -526,6 +554,8 @@ class Widget:
 
     @property
     def y(self):
+        """Y position relative to its parent (or the top of the window if it has no parent)"""
+
         if self.anchor & TOP and self.anchor & BOTTOM:
             return self.pos[1] - self.shape.height // 2
         elif self.anchor & TOP:
@@ -537,6 +567,8 @@ class Widget:
 
     @property
     def topleft(self):
+        """Position of the background relative the the parent's topleft (or the window topleft if no parent)."""
+
         return Pos(self.x, self.y)
 
     @property
@@ -548,6 +580,7 @@ class Widget:
 
     @property
     def shadow_blit_size(self):
+        """Size of the shadow"""
         return self.size + self.shadow.extra_size
 
     @property
@@ -562,6 +595,7 @@ class Widget:
 
     @property
     def background_rect(self):
+        """Rectangle containing the background, relatively to the widget's parent"""
         return Rect(self.topleft, self.size)
 
     @property
@@ -571,14 +605,13 @@ class Widget:
 
     @property
     def content_rect(self):
-        """
-        Position of the content rectangle relative the parent's top left corner.
-        """
-
+        """Position of the content rectangle relative the parent's top left corner."""
         return Rect(self.content_pos, self.shape.content_rect().size)
 
     @staticmethod
     def anchor_to_rect_attr(anchor):
+        """Return the name of the point fixed by the given anchor."""
+
         d = {
             TOP: "midtop",
             LEFT: "midleft",

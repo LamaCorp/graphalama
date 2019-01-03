@@ -46,8 +46,8 @@ def gui():
     def nop(): ...
 
     wid = WidgetList([
-        # Button("Have fun", nop),
-        CarrouselSwitch(["Option 1", "A massive pizza", "Merry Christmas !"], lambda c: print(c), shape=RoundedRect(rounding=100), pos=(400, 250), anchor=CENTER)
+        CarrouselSwitch(["Option 1", "A massive pizza", "Merry Christmas !"], lambda c: print(c), shape=RoundedRect(rounding=100), pos=(400, 250), anchor=CENTER),
+        Button("Have fun", nop),
     ])
 
     while True:

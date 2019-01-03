@@ -28,9 +28,6 @@ class SimpleText(Widget):
     def __repr__(self):
         return "<SimpleText-{}>".format(self.text)
 
-    def __str__(self):
-        return self.text_anchor
-
     @property
     def text(self):
         return str(self._text)

@@ -482,6 +482,14 @@ class Widget:
         if self.children:
             self.children.resize(self.shape.content_rect().size, past_inside_size)
 
+    def auto_update_size(self):
+        """Properly update the size if if auto_size is set to true"""
+
+        if not self.shape.auto_size:
+            return
+
+        self.resize(self.prefered_size)
+
     @property
     def prefered_size(self):
         """Get the size of a rectangular area into which the widget is happy."""
@@ -489,12 +497,15 @@ class Widget:
 
     @property
     def size(self):
-        """Shortcut for self.shape.size"""
+        """Get the size of the widget and correctly resize children when setting size."""
         return self.shape.size
 
     @size.setter
-    def size(self, value):
-        self.shape.size = value
+    def size(self, new_size):
+        previous_size = self.shape.content_rect().size
+        self.shape.size = new_size
+        for child in self.children:
+            child.resize(self.shape.content_rect().size, previous_size)
 
     @property
     def absolute_topleft(self):

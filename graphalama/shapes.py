@@ -67,7 +67,7 @@ class Padding(namedtuple("Padding", ("left", "top", "right", "bottom"))):
         return self.left + self.right
 
     @property
-    def extra_h(self):
+    def extra_height(self):
         """Return the total vertical padding"""
         return self.top + self.bottom
 

@@ -1,7 +1,7 @@
 from _dummy_thread import start_new_thread
 
 from graphalama.colors import ImageBrush, Color, to_color
-from graphalama.constants import CENTER, DEFAULT, LEFT, TRANSPARENT, WHITE, DATA_PATH, GREY, RIGHT
+from graphalama.constants import CENTER, DEFAULT, LEFT, TRANSPARENT, WHITE, DATA_PATH, GREY, RIGHT, ALLANCHOR
 from graphalama.shadow import NoShadow
 from graphalama.shapes import Rectangle
 from .constants import ALLANCHOR
@@ -18,7 +18,7 @@ class Button(Widget):
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
-        self.text_widget = None  # type: SimpleText
+        self.text_widget = self.add_child(SimpleText("", Pos(self.content_rect.size) / 2, None, self.color, anchor=CENTER, shadow=NoShadow()))
         self.text = text
         self.function = function
 
@@ -34,21 +34,10 @@ class Button(Widget):
     @text.setter
     def text(self, value):
 
-        assert isinstance(value, str), "Button.text is only for strings"
+        self.text_widget.text = str(value)
 
         if self.shape.auto_size:
-            text = SimpleText(value, (0, 0), None, self.color, anchor=CENTER, shadow=NoShadow())
-            new_size = Pos(self.shape.widget_size_from_content_size(text.size))
-            text.pos = new_size / 2
-            self.size = new_size
-        else:
-            size = self.shape.content_rect().size
-            text = SimpleText(value, (size[0] / 2, size[1] / 2), size, self.color, anchor=ALLANCHOR)
-
-        # we replace the previous text_widget by the new one
-        if self.text_widget in self.children:
-            self.children.remove(self.text_widget)
-        self.text_widget = self.add_child(text)
+            self.size = self.shape.widget_size_from_content_size(self.text_widget.prefered_size)
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()
@@ -177,33 +166,20 @@ class CarrouselSwitch(Button):
         self.left_arrow = self.add_child(SimpleText("<", (0, cr.height / 2), color=arrow_color, anchor=LEFT))
         self.right_arrow = self.add_child(SimpleText(">", (cr.width, cr.height / 2), color=arrow_color, anchor=RIGHT))
 
+        self.children.remove(self.text_widget)
+        self.text_widget = self.add_child(SimpleText("",
+                                               pos=(cr.width / 2, cr.height / 2),
+                                               shape=(cr.width - self.left_arrow.size[0] - self.right_arrow.size[0], cr.height),
+                                               color=self.color,
+                                               anchor=ALLANCHOR))
+
+
         # Setting properties
         self.options = options
         self.option_index = 0
         self.arrow_color = arrow_color if arrow_color is not None else GREY
 
-
-
-    @property
-    def text(self):
-        """Current selected option string"""
-        return self.text_widget.text
-
-
-    @text.setter
-    def text(self, value):
-
-        # in this case, the option list may no be a list of string, so we need to convert it
-        s = str(value)
-
-        # we set the position to the center of the content_rect
-        size = Pos(self.shape.content_rect().size)
-        text = SimpleText(s, size / 2, color=self.color, anchor=ALLANCHOR)
-
-        # we replace the previous text_widget by the new one
-        if self.text_widget in self.children:
-            self.children.remove(self.text_widget)
-        self.text_widget = self.add_child(text)
+        Widget.LAST_PLACED_WIDGET = self
 
     @property
     def current_option(self):
@@ -223,6 +199,14 @@ class CarrouselSwitch(Button):
         self.text = self.current_option
         # and we call the user defined callback
         self.on_choice(self.current_option)
+
+    @property
+    def text(self):
+        return self.text_widget.text
+
+    @text.setter
+    def text(self, value):
+        self.text_widget.text = str(value)
 
     def on_click(self, event):
         # we want that a click on the right side is the same as a click on the right arrow, so the user doesn't have to click exactly on the arrow

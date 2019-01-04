@@ -212,6 +212,11 @@ class CarrouselSwitch(Button):
         self.text_widget.text = str(value)
 
     def on_click(self, event):
+        if self.moving_text.animations:
+            # there's already some animation running
+            # so we do nothing
+            return
+
         # we want that a click on the right side is the same as a click on the right arrow, so the user doesn't have to click exactly on the arrow
         if event.pos[0] > self.absolute_rect.centerx:
             change = 1
@@ -222,10 +227,13 @@ class CarrouselSwitch(Button):
 
         self.moving_text.pos = self.text_widget.pos
         self.moving_text.text = self.text_widget.text
+        # move away and fade
         self.moving_text.animate(MoveAnim(0.3, deplacement))
         self.moving_text.animate(FadeAnim(0.3))
 
+        # we put it away
         self.text_widget.pos -= deplacement
+        # so it can come in
         self.text_widget.animate(MoveAnim(0.3, deplacement))
         self.text_widget.animate(FadeAnim(0.3, 0, 255))
 

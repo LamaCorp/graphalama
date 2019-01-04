@@ -10,6 +10,7 @@ from .core import Widget, WidgetList
 from .text import SimpleText
 from .maths import Pos
 from .draw import line
+from .anim import FadeAnim, MoveAnim
 
 
 class Button(Widget):
@@ -171,6 +172,9 @@ class CarrouselSwitch(Button):
         cr = self.content_rect
         self.text_widget.anchor = ALLANCHOR
         self.text_widget.size = cr.width - 2*arrow_spacing, cr.height # self.left_arrow.size[0] - self.right_arrow.size[0], cr.height
+        # for the animation when arrows are pressed
+        self.moving_text = self.add_child(SimpleText("", self.text_widget.pos, self.text_widget.size,
+                                      color=GREY, anchor=ALLANCHOR))
 
         # Setting properties
         self.arrow_spacing = arrow_spacing
@@ -210,9 +214,25 @@ class CarrouselSwitch(Button):
     def on_click(self, event):
         # we want that a click on the right side is the same as a click on the right arrow, so the user doesn't have to click exactly on the arrow
         if event.pos[0] > self.absolute_rect.centerx:
-            self.option_index += 1
+            change = 1
         else:
-            self.option_index -=1
+            change = -1
+
+        deplacement = Pos(-change*self.size[0], 0)
+
+        self.moving_text.pos = self.text_widget.pos
+        self.moving_text.text = self.text_widget.text
+        self.moving_text.animate(MoveAnim(0.3, deplacement))
+        self.moving_text.animate(FadeAnim(0.3))
+
+        self.text_widget.pos -= deplacement
+        self.text_widget.animate(MoveAnim(0.3, deplacement))
+        self.text_widget.animate(FadeAnim(0.3, 0, 255))
+
+        # then set the text
+        self.option_index += change
+
+
 
     @property
     def options(self):

@@ -6,7 +6,7 @@ Show the different possibilties of buttons.
 """
 
 
-from random import shuffle
+from random import randint
 
 import pygame
 from pygame.constants import *
@@ -53,10 +53,9 @@ def gui():
 
     # Create a button to change the carrousel color
     def set_text_color():
-        rainbow = list(RAINBOW)
-        shuffle(rainbow)
-        carrousel.text_widget.color = MultiGradient(*rainbow)
-    button = Button("Let's party!", set_text_color, (400, 250), RoundedRect(padding=5), bg_color=NICE_BLUE+(128,), anchor=CENTER)
+         rot = randint(0, len(RAINBOW))
+         carrousel.text_widget.color = MultiGradient(*RAINBOW[rot:], *RAINBOW[:rot])
+    button = Button("Let's party!", set_text_color, (400, 250), bg_color=NICE_BLUE+(128,), anchor=CENTER)
 
     # We have to set the coice function after the button and carousel creation otherwise they'll be referenced before creation
     def on_choice(option):
@@ -65,28 +64,24 @@ def gui():
     carrousel.on_choice = on_choice
 
     # creating a few checkbox
-    checkboxes = WidgetList([CheckBox(f"CheckBox{i}") for i in range(1, 5)])
+    checkboxes = WidgetList([CheckBox(f"CheckBox{i}") for i in range(1, 4)])
 
     wid = WidgetList([carrousel, button, checkboxes])
 
-
-
     while True:
-        for e in pygame.event.get():
-            if e.type == QUIT:
+        for event in pygame.event.get():
+            if event.type == QUIT:
                 return 0
-            elif e.type == KEYDOWN:
-                if e.key == K_ESCAPE:
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
                     return 0
-                if e.key == K_F4 and e.mod & KMOD_ALT:  # Alt+F4 --> quits
-                    return e
-                if e.unicode == '>':
-                    wid[0].arrow_color = (0, 165, 255)
-            elif wid.update(e):
+                if event.key == K_F4 and event.mod & KMOD_ALT:  # Alt+F4 --> quits
+                    return event
+            elif wid.update(event):
                 continue
-            if e.type == VIDEORESIZE:
-                wid.resize(e.size, SCREEN_SIZE)
-                SCREEN_SIZE = e.size
+            if event.type == VIDEORESIZE:
+                wid.resize(event.size, SCREEN_SIZE)
+                SCREEN_SIZE = event.size
                 screen = new_screen()
 
         screen.fill(WHITE)

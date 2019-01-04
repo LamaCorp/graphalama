@@ -142,7 +142,7 @@ class ImageButton(Button):
 
 class CarrouselSwitch(Button):
 
-    def __init__(self, options, on_choice, pos=None, shape=None, color=None, bg_color=None, border_color=None,
+    def __init__(self, options, on_choice=None, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  arrow_color=None, arrow_spacing=None, shadow=None, anchor=None):
         """
         A widget to let the user choose between multiple options.
@@ -157,6 +157,7 @@ class CarrouselSwitch(Button):
         :param arrow_spacing: set the space between the arrow and the text
         """
 
+        on_choice = on_choice if on_choice is not None else lambda c: ...
         arrow_color = arrow_color if arrow_color is not None else GREY
         arrow_spacing = arrow_spacing if arrow_spacing is not None else 5
 

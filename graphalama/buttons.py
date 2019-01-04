@@ -78,10 +78,16 @@ class CheckBox(Widget):
             bg_color = TRANSPARENT
             shadow = NoShadow()
 
+        # because we're creating other widgets in between, we need to save and restore it
+        # so the auto=position works
+        last_widget = Widget.LAST_PLACED_WIDGET
+
         box_size = (20, 20)
         self.box_widget = Button("", self.change_checked, (0, 0), Rectangle(box_size, 1, 0, box_size, box_size),
                                  border_color=color, anchor=LEFT)
         self.text_widget = SimpleText(text, (0, 0), color=color, shadow=NoShadow(), anchor=LEFT)
+
+        Widget.LAST_PLACED_WIDGET = last_widget
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 

@@ -224,7 +224,7 @@ class ImageBrush(Color):
 
         super().__init__(background)
         self.file = file
-        self.image = pygame.image.load(file)  # type: pygame.Surface
+        self.image = pygame.image.load(file).convert()  # type: pygame.Surface
         self.mode = mode
 
     def __repr__(self):
@@ -298,7 +298,7 @@ class ImageListBrush(ImageBrush):
     def _paint(self, surf: pygame.Surface):
         # We load the image if it isn't
         if not self.images[self.index]:
-            self.images[self.index] = pygame.image.load(self._files[self.index])
+            self.images[self.index] = pygame.image.load(self._files[self.index]).convert()
 
         self.image = self.images[self.index]
         super()._paint(surf)

@@ -90,14 +90,14 @@ class Rectangle:
 
         self.widget = None
 
-        self.border = border if border else 0
+        self.border = border if border is not None else 0
 
         self.bg_offset = (0, 0)
         self.min_size = min_size if min_size else (5, 5)
         self.max_size = max_size if max_size else (None, None)
 
         if padding is DEFAULT:
-            padding = 0
+            padding = 2
         self.padding = padding if isinstance(padding, Padding) else Padding(padding)
 
         if size is DEFAULT:
@@ -126,7 +126,6 @@ class Rectangle:
         if self.widget and self.last_width != self.width:
             # so we re-draw the img on next render and reposition children
             self.widget.invalidate()
-
 
     @property
     def height(self):

@@ -73,7 +73,7 @@ class Widget:
         self._color = None  # type: Color
         self.color = color if color else BLACK  # type: Color
         self._bg_color = None  # type: Color
-        self.bg_color = bg_color if bg_color else LLAMA  # type: Color
+        self.bg_color = bg_color if bg_color else WHITESMOKE  # type: Color
         self._border_color = None  # type: Color
         self.border_color = border_color if border_color else GREY  # type: Color
         self._transparency = None  # type: int

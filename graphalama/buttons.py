@@ -167,7 +167,9 @@ class CarouselSwitch(Button):
         arrow_color = arrow_color if arrow_color is not None else GREY
         arrow_spacing = arrow_spacing if arrow_spacing is not None else 5
 
-        self.on_choice = on_choice
+        # we set a nop function as we don't want this function to be called multiple times
+        # when we set everything up
+        self.on_choice = lambda *args: 0
         self._options = []
         self._option_index = 0
         self._arrow_color = None
@@ -188,6 +190,8 @@ class CarouselSwitch(Button):
         self.options = options
         self.option_index = 0
         self.arrow_color = arrow_color if arrow_color is not None else GREY
+
+        self.on_choice = on_choice
 
         Widget.LAST_PLACED_WIDGET = self
 
@@ -246,8 +250,6 @@ class CarouselSwitch(Button):
 
         # then set the text
         self.option_index += change
-
-
 
     @property
     def options(self):

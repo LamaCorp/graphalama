@@ -11,7 +11,7 @@ from random import randint
 import pygame
 from pygame.constants import *
 
-from graphalama.widgets import Button, CarrouselSwitch, CheckBox
+from graphalama.widgets import Button, CarouselSwitch, CheckBox
 from graphalama.colors import Gradient, MultiGradient
 from graphalama.constants import ORANGE, PINK, RIGHT, LEFT, TOP, BLUE, RAINBOW, BOTTOM, CENTER, NICE_BLUE, RAINBOW, LLAMA
 from graphalama.core import WidgetList
@@ -46,10 +46,10 @@ def gui():
         "Pink": PINK,
     }
 
-    # Creating a CarrouselSwitch to change the colors of the button + its own arrow. We need to set the function after creation, see below
-    carrousel = CarrouselSwitch(list(colors.keys()), nop,
-                                (400, 180), RoundedRect(rounding=100),
-                                bg_color=(240, 240, 240, 240), arrow_spacing=30, anchor=CENTER)
+    # Creating a CarouselSwitch to change the colors of the button + its own arrow. We need to set the function after creation, see below
+    carrousel = CarouselSwitch(list(colors.keys()), nop,
+                               (400, 180), RoundedRect(rounding=100),
+                               bg_color=(240, 240, 240, 240), arrow_spacing=30, anchor=CENTER)
 
     # Create a button to change the carrousel color
     def set_text_color():

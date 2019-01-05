@@ -1,3 +1,3 @@
-from .buttons import Button, ImageButton, CheckBox, CarrouselSwitch
+from .buttons import Button, ImageButton, CheckBox, CarouselSwitch
 from .text import SimpleText
 from .core import Widget, WidgetList

@@ -1,5 +1,7 @@
 import pygame
-from graphalama.widgets import WidgetList
+from .widgets import WidgetList
+from .colors import to_color
+from .constants import WHITE
 
 
 class App:
@@ -62,13 +64,8 @@ class App:
 
             self.current_screen.internal_logic()
 
-            rects = self.current_screen.render(self.display)
-
-            # The screen may have implemented smart updating
-            if rects is not None:
-                pygame.display.update(rects)
-            else:
-                pygame.display.flip()
+            self.current_screen.render(self.display)
+            pygame.display.flip()
 
             self.clock.tick(self.current_screen.FPS)
 
@@ -105,7 +102,10 @@ class Screen:
 
     FPS = 60
 
-    def __init__(self, app, widgets=()):
+    def __init__(self, app, widgets=(), bg_color=None):
+        bg_color = WHITE if bg_color is None else bg_color
+        self.bg_color = bg_color
+
         self.app = app
         self.widgets = WidgetList(widgets)
 
@@ -114,8 +114,16 @@ class Screen:
         self.app = app
         return self
 
+    @property
+    def bg_color(self):
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, value):
+        self._bg_color = to_color(value)
+
     def draw_background(self, display):
-        display.fill((255, 255, 255))
+        self.bg_color.paint(display)
 
     def update(self, event):
         self.widgets.update(event)

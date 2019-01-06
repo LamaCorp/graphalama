@@ -105,6 +105,7 @@ class Screen:
     def __init__(self, app, widgets=(), bg_color=None):
         bg_color = WHITE if bg_color is None else bg_color
         self.bg_color = bg_color
+        self.background = None
 
         self.app = app
         self.widgets = WidgetList(widgets)
@@ -120,10 +121,17 @@ class Screen:
 
     @bg_color.setter
     def bg_color(self, value):
+        self.background = None
         self._bg_color = to_color(value)
 
     def draw_background(self, display):
-        self.bg_color.paint(display)
+
+        # caching mechanism, particularly usefull when the Color is an image or a computer drawing (gradient...)
+        if not self.background or display.get_size() != self.background.get_size():
+            self.background = pygame.Surface(display.get_size())
+            self.bg_color.paint(self.background)
+
+        display.blit(self.background, (0, 0))
 
     def update(self, event):
         self.widgets.update(event)

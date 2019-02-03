@@ -274,7 +274,7 @@ class Widget:
                 make_transparent(self._shadow_img, self.transparency)
 
             # noinspection PyArgumentList
-            self._shadow_img.convert_alpha()
+            self._shadow_img = self._shadow_img.convert_alpha()
 
         return self._shadow_img
 
@@ -300,7 +300,7 @@ class Widget:
                 make_transparent(self._bg, self.transparency)
 
             # noinspection PyArgumentList
-            self._bg.convert_alpha()
+            self._bg = self._bg.convert_alpha()
 
         return self._bg  # type: pygame.SurfaceType
 
@@ -349,7 +349,7 @@ class Widget:
                 make_transparent(self._content, self.transparency)
 
             # noinspection PyArgumentList
-            self._content.convert_alpha()
+            self._content = self._content.convert_alpha()
 
         return self._content
 

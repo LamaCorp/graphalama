@@ -134,7 +134,7 @@ class Screen:
         display.blit(self.background, (0, 0))
 
     def update(self, event):
-        self.widgets.update(event)
+        return self.widgets.update(event)
 
     def internal_logic(self):
         """Override it if your screen has stuff to run once a frame, before rendering"""

@@ -33,8 +33,13 @@ class App:
 
         # evaluating defaults
         if display_size is None:
-            # default s the bigger we can
-            display_size = pygame.display.set_mode(pygame.display.list_modes()[0])
+            if pygame.dislpay.list_modes() == -1:
+                # This means that any resolution should work
+                # So we choose 1920x1080 because we can
+                display_size = pygame.display.set_mode((1920, 1080))
+            else:
+                # default to the bigger we can
+                display_size = pygame.display.set_mode(pygame.display.list_modes()[0])
 
         self.screens = screens
         self.screen = initial_screen

@@ -175,6 +175,7 @@ class Widget:
 
     @property
     def has_content(self):
+        return  True
         return bool(self.children)
 
     # Inputs / update

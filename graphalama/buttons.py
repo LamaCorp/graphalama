@@ -124,7 +124,7 @@ class CheckBox(Widget):
             self._checked = value
 
         if self.checked:
-            self.box_widget.bg_color = ImageBrush(DATA_PATH + "tick.png", CENTER)
+            self.box_widget.bg_color = ImageBrush.from_file(DATA_PATH + "tick.png", CENTER)
         else:
             self.box_widget.bg_color = Color(WHITE)
 

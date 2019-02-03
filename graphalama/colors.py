@@ -209,11 +209,11 @@ class MultiGradient(Gradient):
 
 
 class ImageBrush(Color):
-    def __init__(self, file, mode=FIT, background=TRANSPARENT):
+    def __init__(self, surf, mode=FIT, background=TRANSPARENT):
         """
         Color a surface with an image.
 
-        :param file: Path to the image
+        :param surf: The surface to paint with
         :param mode: One of the four constants:
           CENTER: Center the image on the surface without changing the size.
           FIT: Fit the image inside the surface, leaving some space on the edges
@@ -223,15 +223,20 @@ class ImageBrush(Color):
         """
 
         super().__init__(background)
-        self.file = file
-        self.image = pygame.image.load(file).convert_alpha()  # type: pygame.Surface
+        # self.file = surf
+        self.image = surf  # pygame.image.load(surf).convert_alpha()  # type: pygame.Surface
         self.mode = mode
 
     def __repr__(self):
-        return "<Brush-{}>".format(self.file)
+        return "<Brush-{}>".format(self.mode)
 
     def __bool__(self):
         return True
+
+    @classmethod
+    def from_file(cls, path, mode=FIT, background=TRANSPARENT):
+        surf = pygame.image.load(path).convert_alpha()
+        return cls(surf, mode=mode, background=background)
 
     @property
     def has_transparency(self):
@@ -265,21 +270,25 @@ class ImageBrush(Color):
 
 
 class ImageListBrush(ImageBrush):
-    def __init__(self, *files, mode=FIT, background=TRANSPARENT):
+    def __init__(self, *surfs, mode=FIT, background=TRANSPARENT):
         """
         Paint a surface with the image from a list. Set index to choose which image
 
-        :param files: List of path to the images. They wont be loaded unless required
+        :param surfs: list of images
         :param mode: See ImageBrush
         :param background: See ImageBrush
         """
-        assert len(files), "There should be at least one image."
-        super().__init__(files[0], mode, background)
+        assert len(surfs), "There should be at least one image."
+        super().__init__(surfs[0], mode, background)
 
-        self._files = files
-        self.images = [None] * len(files)
+        self.images = surfs
         self._index = 0
         self.index = 0
+
+    @classmethod
+    def from_files(cls, paths, mode=FIT, background=TRANSPARENT):
+        imgs = [pygame.image.load(path).convert_alpha() for path in paths]
+        cls(imgs, mode=mode, background=background)
 
     @property
     def index(self):

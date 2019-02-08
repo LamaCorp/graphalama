@@ -23,6 +23,7 @@ class Widget:
     LAST_PLACED_WIDGET = None
     ACCEPT_CLICKS = False
     ACCEPT_KEYBOARD_INPUT = False
+    HAS_CONTENT = False
 
     def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT, anchor=DEFAULT):
@@ -175,8 +176,7 @@ class Widget:
 
     @property
     def has_content(self):
-        return  True
-        return bool(self.children)
+        return self.HAS_CONTENT
 
     # Inputs / update
 

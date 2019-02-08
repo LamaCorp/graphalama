@@ -135,6 +135,7 @@ class CheckBox(Widget):
 
 
 class ImageButton(Button):
+    HAS_CONTENT = True
 
     def __init__(self, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  shadow=None, anchor=None):
@@ -147,6 +148,7 @@ class ImageButton(Button):
 
 
 class CarouselSwitch(Button):
+    HAS_CONTENT = True
 
     def __init__(self, options, on_choice=None, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  arrow_color=None, arrow_spacing=None, shadow=None, anchor=None):

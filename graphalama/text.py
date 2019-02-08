@@ -7,6 +7,7 @@ from .shadow import NoShadow
 
 
 class SimpleText(Widget):
+    HAS_CONTENT = True
 
     def __init__(self, text, pos=None, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
                  shadow=None, anchor=DEFAULT, text_anchor=DEFAULT):

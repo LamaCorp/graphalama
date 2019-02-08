@@ -11,13 +11,17 @@ A shape class defines two important methods:
 """
 from collections import namedtuple
 from math import pi
+from typing import TYPE_CHECKING
 
 import pygame.examples.fonty
 
-from graphalama.maths import Pos
+from .maths import Pos
 from .constants import DEFAULT
 from .draw import roundrect, polygon
 from .maths import clamp
+
+if TYPE_CHECKING:
+    from .core import Widget
 
 INSIDE = (255, 255, 255, 255)
 OUTSIDE = (255, 255, 255, 0)
@@ -88,7 +92,7 @@ class Rectangle:
             One or two elements can be None if no maximum size.
         """
 
-        self.widget = None
+        self.widget = None  # type: Widget
 
         self.border = border if border is not None else 0
 
@@ -147,6 +151,19 @@ class Rectangle:
     @size.setter
     def size(self, value):
         self.width, self.height = value
+
+    def set_border_and_fix_center(self, border):
+        """Change the border by expanding the widget without modifying its contents"""
+        diff = border - self.border
+        anchor = self.widget.anchor
+        rect = self.widget.background_rect
+
+        self.border = border
+        self.size += (2*diff, 2*diff)
+        new_rect = self.widget.background_rect
+        new_rect.center = rect.center
+
+        self.widget.pos = getattr(new_rect, self.widget.anchor_to_rect_attr(anchor))
 
     def get_mask(self):
         """

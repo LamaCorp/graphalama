@@ -3,6 +3,7 @@ In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
 from typing import List, Union
+import logging
 
 import pygame
 from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP
@@ -16,6 +17,8 @@ from .draw import make_transparent
 from .maths import Pos, clamp
 from .shadow import Shadow
 from .shapes import Rectangle
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Widget:
@@ -35,6 +38,8 @@ class Widget:
         :param bg_color: A tuple of RGB or RGBA value or an object with a paint(img: Surface) method
         :param anchor: The sides where the widget will be anchored: BOTTOM|RIGHT
         """
+
+        LOGGER.info("Starting to initialize Widget")
 
         self._shadow_img = None  # type: pygame.SurfaceType
         self._bg = None  # type: pygame.SurfaceType
@@ -88,6 +93,7 @@ class Widget:
         self.animations = []  # type: List[Anim]
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def __repr__(self):
         return "<Widget at {}>".format(self.pos)

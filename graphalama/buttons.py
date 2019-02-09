@@ -1,5 +1,6 @@
 from math import pi, sin, cos
 from _dummy_thread import start_new_thread
+import logging
 
 from graphalama.colors import ImageBrush, Color, to_color
 from graphalama.constants import CENTER, DEFAULT, LEFT, TRANSPARENT, WHITE, DATA_PATH, GREY, RIGHT, ALLANCHOR
@@ -12,13 +13,15 @@ from .maths import Pos
 from .draw import line
 from .anim import FadeAnim, MoveAnim
 
+LOGGER = logging.getLogger(__name__)
+
 
 class Button(Widget):
     ACCEPT_CLICKS = True
 
     def __init__(self, text, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  shadow=None, anchor=None):
-
+        LOGGER.info("Starting to initialize Button")
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
         self.text_widget = self.add_child(SimpleText("", Pos(self.content_rect.size) / 2, None, self.color, anchor=CENTER, shadow=NoShadow()))
@@ -26,6 +29,7 @@ class Button(Widget):
         self.function = function
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def __str__(self):
         return "<Button-{}>".format(self.text)
@@ -41,6 +45,7 @@ class Button(Widget):
 
         if self.shape.auto_size:
             self.size = self.shape.widget_size_from_content_size(self.text_widget.prefered_size)
+        LOGGER.info(f"Text of {self} changed")
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()
@@ -50,6 +55,7 @@ class Button(Widget):
         self.invalidate_shadow()
 
     def on_click(self, event):
+        LOGGER.info(f"{self} clicked")
         start_new_thread(self.function, ())
 
     def on_mouse_button_up(self, event):
@@ -74,6 +80,8 @@ class CheckBox(Widget):
 
     def __init__(self, text="", pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT, anchor=DEFAULT):
+
+        LOGGER.info("Starting to initialize CheckBox")
 
         if bg_color is DEFAULT:
             bg_color = TRANSPARENT
@@ -102,8 +110,10 @@ class CheckBox(Widget):
         self.checked = False
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def on_click(self, event):
+        LOGGER.info(f"{self} clicked")
         self.change_checked()
 
     @property
@@ -196,6 +206,7 @@ class CarouselSwitch(Button):
         self.on_choice = on_choice
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Initialized {self}")
 
     @property
     def current_option(self):
@@ -233,8 +244,10 @@ class CarouselSwitch(Button):
         # we want that a click on the right side is the same as a click on the right arrow, so the user doesn't have to click exactly on the arrow
         if event.pos[0] > self.absolute_rect.centerx:
             change = 1
+            LOGGER.info(f"{self} was clicked to the right")
         else:
             change = -1
+            LOGGER.info(f"{self} was clicked to the left")
 
         deplacement = Pos(-change*self.size[0], 0)
 

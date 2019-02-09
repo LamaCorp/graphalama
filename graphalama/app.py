@@ -1,7 +1,10 @@
 import pygame
+import logging
 from .widgets import WidgetList
 from .colors import to_color
 from .constants import WHITE
+
+LOGGER = logging.getLogger(__name__)
 
 
 class App:
@@ -31,9 +34,11 @@ class App:
         :param initial_screen: the ID of the first screen.
         """
 
+        LOGGER.info("Starting to initialize an App")
         # evaluating defaults
         if display_size is None:
             if pygame.display.list_modes() == -1:
+                LOGGER.info("Any resolution should work on this device. Choosing (1920, 1080)")
                 # This means that any resolution should work
                 # So we choose 1920x1080 because we can
                 display_size = pygame.display.set_mode((1920, 1080),
@@ -41,6 +46,7 @@ class App:
                                                        32).convert_alpha()
             else:
                 # default to the bigger we can
+                LOGGER.info(f"Choosing the biggest resolution we can: {pygame.display.list_modes()[0]}")
                 display_size = pygame.display.set_mode(pygame.display.list_modes()[0])
 
         self.screens = screens
@@ -50,21 +56,25 @@ class App:
         self.running = False
 
         self.current_screen = self.screens[self.screen](self)
+        LOGGER.info("Finished initializing an App")
 
     def quit(self):
         """Kill the app"""
+        LOGGER.info("Quitting an app")
         self.running = False
 
     def run(self):
         """The main loop of the app"""
-
+        LOGGER.info("Starting the run of an app")
         if self.running:
-            raise RuntimeError("Tou try to run an already running app")
+            LOGGER.error("Trying to run an already running app")
+            raise RuntimeError("You tried to run an already running app")
 
         self.running = True
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    LOGGER.info("Pygame tells us to quit")
                     self.quit()
                 else:
                     self.current_screen.update(event)
@@ -83,6 +93,7 @@ class App:
         :param new_screen_id: A key of the screens dictionary
         """
 
+        LOGGER.info(f"Changing screen from {self.screen} to {new_screen_id}")
         self.screen = new_screen_id
         # We instantiate the screen class
         self.current_screen = self.screens[self.screen](self)
@@ -96,6 +107,7 @@ class App:
 
         self.screen = None
         self.current_screen = screen(self)
+        LOGGER.info(f"Changing screen to temp screen {self.current_screen}")
 
 
 class Screen:
@@ -110,6 +122,7 @@ class Screen:
     FPS = 60
 
     def __init__(self, app, widgets=(), bg_color=None):
+        LOGGER.info("Starting a new Screen")
         bg_color = WHITE if bg_color is None else bg_color
         self.bg_color = bg_color
         self.background = None
@@ -118,7 +131,7 @@ class Screen:
         self.widgets = WidgetList(widgets)
 
     def __call__(self, app):
-        # This way we can pass already build screens to a achine without errors
+        # This way we can pass already build screens to a machine without errors
         self.app = app
         return self
 
@@ -133,7 +146,7 @@ class Screen:
 
     def draw_background(self, display):
 
-        # caching mechanism, particularly usefull when the Color is an image or a computer drawing (gradient...)
+        # caching mechanism, particularly useful when the Color is an image or a computer drawing (gradient...)
         if not self.background or display.get_size() != self.background.get_size():
             self.background = pygame.Surface(display.get_size())
             self.bg_color.paint(self.background)

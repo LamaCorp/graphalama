@@ -1,9 +1,12 @@
 import pygame
+import logging
 
 from .constants import CENTER, DEFAULT, TRANSPARENT
 from .core import Widget
 from .font import default_font
 from .shadow import NoShadow
+
+LOGGER = logging.getLogger(__name__)
 
 
 class SimpleText(Widget):
@@ -11,6 +14,8 @@ class SimpleText(Widget):
 
     def __init__(self, text, pos=None, shape=None, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT, font=DEFAULT,
                  shadow=None, anchor=DEFAULT, text_anchor=DEFAULT):
+
+        LOGGER.info("Starting to initialize SimpleText")
 
         self.text_anchor = text_anchor if text_anchor is not None else CENTER
         self._text = text
@@ -25,6 +30,7 @@ class SimpleText(Widget):
             shadow = NoShadow()
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
+        LOGGER.info(f"Finished initialized {self}")
 
     def __repr__(self):
         return "<SimpleText-{}>".format(self.text)
@@ -34,7 +40,7 @@ class SimpleText(Widget):
         return str(self._text)
 
     @text.setter
-    def text(self,value):
+    def text(self, value):
         self._text = value
         if self.shape.auto_size:
             # otherwise the size would stay the same even if the text is smaller/bigger
@@ -44,6 +50,7 @@ class SimpleText(Widget):
         else:
             # Only the content has changed, not the shadow/bg
             self.invalidate_content()
+        LOGGER.info(f"Text of {self} changed")
 
     @property
     def prefered_size(self):

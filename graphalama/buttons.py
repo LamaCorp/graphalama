@@ -36,7 +36,7 @@ class Button(Widget):
 
     @property
     def text(self):
-        return self.text_widget.text
+        return "" if not hasattr(self, "text_widget") else self.text_widget.text
 
     @text.setter
     def text(self, value):
@@ -229,7 +229,7 @@ class CarouselSwitch(Button):
 
     @property
     def text(self):
-        return self.text_widget.text
+        return "" if not hasattr(self, "text_widget") else self.text_widget.text
 
     @text.setter
     def text(self, value):

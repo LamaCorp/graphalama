@@ -1,5 +1,6 @@
 from math import pi, sin, cos
 from _dummy_thread import start_new_thread
+import logging
 
 from graphalama.colors import ImageBrush, Color, to_color
 from graphalama.constants import CENTER, DEFAULT, LEFT, TRANSPARENT, WHITE, DATA_PATH, GREY, RIGHT, ALLANCHOR
@@ -10,6 +11,9 @@ from .core import Widget, WidgetList
 from .text import SimpleText
 from .maths import Pos
 from .draw import line
+from .anim import FadeAnim, MoveAnim
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Button(Widget):
@@ -17,7 +21,7 @@ class Button(Widget):
 
     def __init__(self, text, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  shadow=None, anchor=None):
-
+        LOGGER.info("Starting to initialize Button")
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
         self.text_widget = self.add_child(SimpleText("", Pos(self.content_rect.size) / 2, None, self.color, anchor=CENTER, shadow=NoShadow()))
@@ -25,13 +29,14 @@ class Button(Widget):
         self.function = function
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def __str__(self):
         return "<Button-{}>".format(self.text)
 
     @property
     def text(self):
-        return self.text_widget.text
+        return "" if not hasattr(self, "text_widget") else self.text_widget.text
 
     @text.setter
     def text(self, value):
@@ -40,6 +45,7 @@ class Button(Widget):
 
         if self.shape.auto_size:
             self.size = self.shape.widget_size_from_content_size(self.text_widget.prefered_size)
+        LOGGER.info(f"Text of {self} changed")
 
     def on_mouse_enter(self, event):
         self.invalidate_bg()
@@ -49,6 +55,7 @@ class Button(Widget):
         self.invalidate_shadow()
 
     def on_click(self, event):
+        LOGGER.info(f"{self} clicked")
         start_new_thread(self.function, ())
 
     def on_mouse_button_up(self, event):
@@ -74,14 +81,22 @@ class CheckBox(Widget):
     def __init__(self, text="", pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT, anchor=DEFAULT):
 
+        LOGGER.info("Starting to initialize CheckBox")
+
         if bg_color is DEFAULT:
             bg_color = TRANSPARENT
             shadow = NoShadow()
+
+        # because we're creating other widgets in between, we need to save and restore it
+        # so the auto=position works
+        last_widget = Widget.LAST_PLACED_WIDGET
 
         box_size = (20, 20)
         self.box_widget = Button("", self.change_checked, (0, 0), Rectangle(box_size, 1, 0, box_size, box_size),
                                  border_color=color, anchor=LEFT)
         self.text_widget = SimpleText(text, (0, 0), color=color, shadow=NoShadow(), anchor=LEFT)
+
+        Widget.LAST_PLACED_WIDGET = last_widget
 
         super().__init__(pos, shape, color, bg_color, border_color, shadow, anchor)
 
@@ -95,8 +110,10 @@ class CheckBox(Widget):
         self.checked = False
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def on_click(self, event):
+        LOGGER.info(f"{self} clicked")
         self.change_checked()
 
     @property
@@ -117,7 +134,7 @@ class CheckBox(Widget):
             self._checked = value
 
         if self.checked:
-            self.box_widget.bg_color = ImageBrush(DATA_PATH + "tick.png", CENTER)
+            self.box_widget.bg_color = ImageBrush.from_file(DATA_PATH + "tick.png", CENTER)
         else:
             self.box_widget.bg_color = Color(WHITE)
 
@@ -128,6 +145,7 @@ class CheckBox(Widget):
 
 
 class ImageButton(Button):
+    HAS_CONTENT = True
 
     def __init__(self, function, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  shadow=None, anchor=None):
@@ -139,9 +157,10 @@ class ImageButton(Button):
         self.color.paint(content_surf)
 
 
-class CarrouselSwitch(Button):
+class CarouselSwitch(Button):
+    HAS_CONTENT = True
 
-    def __init__(self, options, on_choice, pos=None, shape=None, color=None, bg_color=None, border_color=None,
+    def __init__(self, options, on_choice=None, pos=None, shape=None, color=None, bg_color=None, border_color=None,
                  arrow_color=None, arrow_spacing=None, shadow=None, anchor=None):
         """
         A widget to let the user choose between multiple options.
@@ -156,10 +175,13 @@ class CarrouselSwitch(Button):
         :param arrow_spacing: set the space between the arrow and the text
         """
 
+        on_choice = on_choice if on_choice is not None else lambda c: ...
         arrow_color = arrow_color if arrow_color is not None else GREY
         arrow_spacing = arrow_spacing if arrow_spacing is not None else 5
 
-        self.on_choice = on_choice
+        # we set a nop function as we don't want this function to be called multiple times
+        # when we set everything up
+        self.on_choice = lambda *args: 0
         self._options = []
         self._option_index = 0
         self._arrow_color = None
@@ -171,6 +193,9 @@ class CarrouselSwitch(Button):
         cr = self.content_rect
         self.text_widget.anchor = ALLANCHOR
         self.text_widget.size = cr.width - 2*arrow_spacing, cr.height # self.left_arrow.size[0] - self.right_arrow.size[0], cr.height
+        # for the animation when arrows are pressed
+        self.moving_text = self.add_child(SimpleText("", self.text_widget.pos, self.text_widget.size,
+                                      color=GREY, anchor=ALLANCHOR))
 
         # Setting properties
         self.arrow_spacing = arrow_spacing
@@ -178,7 +203,10 @@ class CarrouselSwitch(Button):
         self.option_index = 0
         self.arrow_color = arrow_color if arrow_color is not None else GREY
 
+        self.on_choice = on_choice
+
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Initialized {self}")
 
     @property
     def current_option(self):
@@ -201,18 +229,42 @@ class CarrouselSwitch(Button):
 
     @property
     def text(self):
-        return self.text_widget.text
+        return "" if not hasattr(self, "text_widget") else self.text_widget.text
 
     @text.setter
     def text(self, value):
         self.text_widget.text = str(value)
 
     def on_click(self, event):
+        if self.moving_text.animations:
+            # there's already some animation running
+            # so we do nothing
+            return
+
         # we want that a click on the right side is the same as a click on the right arrow, so the user doesn't have to click exactly on the arrow
         if event.pos[0] > self.absolute_rect.centerx:
-            self.option_index += 1
+            change = 1
+            LOGGER.info(f"{self} was clicked to the right")
         else:
-            self.option_index -=1
+            change = -1
+            LOGGER.info(f"{self} was clicked to the left")
+
+        deplacement = Pos(-change*self.size[0], 0)
+
+        self.moving_text.pos = self.text_widget.pos
+        self.moving_text.text = self.text_widget.text
+        # move away and fade
+        self.moving_text.animate(MoveAnim(0.3, deplacement))
+        self.moving_text.animate(FadeAnim(0.3))
+
+        # we put it away
+        self.text_widget.pos -= deplacement
+        # so it can come in
+        self.text_widget.animate(MoveAnim(0.3, deplacement))
+        self.text_widget.animate(FadeAnim(0.3, 0, 255))
+
+        # then set the text
+        self.option_index += change
 
     @property
     def options(self):

@@ -3,6 +3,7 @@ In this module are defined all the core concepts of the library.
 You shouldn't need to import or use this module unless you are developping new widgets from scratch.
 """
 from typing import List, Union
+import logging
 
 import pygame
 from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYDOWN, KEYUP
@@ -17,12 +18,15 @@ from .maths import Pos, clamp
 from .shadow import Shadow
 from .shapes import Rectangle
 
+LOGGER = logging.getLogger(__name__)
+
 
 class Widget:
 
     LAST_PLACED_WIDGET = None
     ACCEPT_CLICKS = False
     ACCEPT_KEYBOARD_INPUT = False
+    HAS_CONTENT = False
 
     def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,
                  shadow=DEFAULT, anchor=DEFAULT):
@@ -34,6 +38,8 @@ class Widget:
         :param bg_color: A tuple of RGB or RGBA value or an object with a paint(img: Surface) method
         :param anchor: The sides where the widget will be anchored: BOTTOM|RIGHT
         """
+
+        LOGGER.info("Starting to initialize Widget")
 
         self._shadow_img = None  # type: pygame.SurfaceType
         self._bg = None  # type: pygame.SurfaceType
@@ -73,7 +79,7 @@ class Widget:
         self._color = None  # type: Color
         self.color = color if color else BLACK  # type: Color
         self._bg_color = None  # type: Color
-        self.bg_color = bg_color if bg_color else LLAMA  # type: Color
+        self.bg_color = bg_color if bg_color else WHITESMOKE  # type: Color
         self._border_color = None  # type: Color
         self.border_color = border_color if border_color else GREY  # type: Color
         self._transparency = None  # type: int
@@ -87,6 +93,7 @@ class Widget:
         self.animations = []  # type: List[Anim]
 
         Widget.LAST_PLACED_WIDGET = self
+        LOGGER.info(f"Finished initializing {self}")
 
     def __repr__(self):
         return "<Widget at {}>".format(self.pos)
@@ -175,7 +182,7 @@ class Widget:
 
     @property
     def has_content(self):
-        return bool(self.children)
+        return self.HAS_CONTENT
 
     # Inputs / update
 
@@ -274,7 +281,7 @@ class Widget:
                 make_transparent(self._shadow_img, self.transparency)
 
             # noinspection PyArgumentList
-            self._shadow_img.convert_alpha()
+            self._shadow_img = self._shadow_img.convert_alpha()
 
         return self._shadow_img
 
@@ -300,7 +307,7 @@ class Widget:
                 make_transparent(self._bg, self.transparency)
 
             # noinspection PyArgumentList
-            self._bg.convert_alpha()
+            self._bg = self._bg.convert_alpha()
 
         return self._bg  # type: pygame.SurfaceType
 
@@ -349,7 +356,7 @@ class Widget:
                 make_transparent(self._content, self.transparency)
 
             # noinspection PyArgumentList
-            self._content.convert_alpha()
+            self._content = self._content.convert_alpha()
 
         return self._content
 

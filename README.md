@@ -3,16 +3,16 @@
 ## Aim
 
 Pygame is a great and simple way to create basic windowed applications.
-It is therfore a privilieged entry point for python learners to get out of the console.
+It is therefore a privileged entry point for python learners to get out of the console.
 However, people often ask for GUI features in pygame: _"How can I have a simple button ?"_ or _"How can the user enter their name ?"_.
 
-The goal of this librairy is to answer all those questions and provide the easiest possible interface to create, update, control and manipulate what we will call widgets. (Buttons, TextBoxes, Sliders, Switches...)
+The goal of this library is to answer all those questions and provide the easiest possible interface to create, update, control and manipulate what we will call widgets. (Buttons, TextBoxes, Sliders, Switches...)
 
 ### Our principles
 
 - KISS: Keep it sweet and simple
 - Simple and ugly are not synonyms
-- Simple can be powerfull
+- Simple can be powerful
 - Simple should be customisable
 - No code is better than ugly code
 
@@ -22,7 +22,7 @@ You can install a stable version using pip
 ```
 pip install graphalama
 ```
-Or a developper version with
+Or a developer version with
 ```
 git clone https://gitlab.com/lama-corp/graphalama
 cd graphalama
@@ -63,7 +63,7 @@ while not stop:
 
 For any widget you need to have at least 3 parts in the code to implement it: creation, handling the input, and rendering it. Some widget can have an internal logic going like clock or timer but we'll come back on that later.
 
-Say you want to add a button in your window. A big green play button. We reduce each step to the minimun.
+Say you want to add a button in your window. A big green play button. We reduce each step to the minimum.
 
 - Creation :
       `play_button = Button("PLAY", bg_color=GREEN, function=play)`
@@ -96,7 +96,7 @@ while True:
 
 ## Customisation
 
-Before knowing how to cutomise your widgets so they match your style, we have to understand what *is* a widget.
+Before knowing how to customise your widgets so they match your style, we have to understand what *is* a widget.
 A widget is made of three things:
  - a **Shadow**: optional, it provides a nice depth to our application and accentuate our widgets
  - a **Shape**: defines the shape of the background. It also defines the borders, the size and where you can click/select the widget. To list a few common: Rectangle, Circle, RoundedRect...
@@ -113,11 +113,11 @@ First, let's have a look to the common parameters that aren't part of the shadow
 With graphalama, as with pygame a position is a couple of integers, (0, 0) being the topleft corner and `(x, y)` being the `x`-st pixel on the `y`-st line of the screen.
 Every time we'll need a position as an argument for a function it will be a tuple `(x, y)` of integers.
 
-Graphalama has a powerfull positioning system for the widgets, whose goal is to be able to design resizable applications witout more effort.
+Graphalama has a powerful positioning system for the widgets, whose goal is to be able to design resizable applications without more effort.
 A widget's position is defined by two elements: its coordinates `pos` and its `anchor`. The `anchor` defines where the widget is anchored,
 that is, where it will stay when the window is resized and where it will be first put on the screen.
 
-For instance, if the anchor ia `TOPLEFT`, the widget will always stay at the same distance of the top and the left of the screen, no matter how the window is resized.
+For instance, if the anchor is `TOPLEFT`, the widget will always stay at the same distance of the top and the left of the screen, no matter how the window is resized.
 Its `pos` will then be the topleft corner of the widget. This is the default anchor, so we can place our widgets like we would do in most frameworks.
 
 But say, we want a widget to always stay on the right side of the screen (like a "next" button), we just need to set the anchor to `RIGHT`
@@ -138,9 +138,9 @@ Two conclude, there are four things to remember:
  - We can anchor a widget to one or more side of the window by setting the anchor to `RIGHT`, `LEFT`, `TOP` and `BOTTOM`.
  Those constants are defined in `graphalama.constants`.
  - We can combine the anchors with the pipe symbol, `|`, so we anchor a widget to the top right corner with `anchor=TOP|RIGHT`
- - Not only the position, but also the size can be controled with anchors. If `anchor=LEFT|RIGHT`, the distance from the widget
- to both side wil stay constant. Therefore the width will stretch if the window gets bigger and shrink if the window gets smaller.
- - The `pos` of a widget always reflect the anchor: if the anchor is `BOTTOM|RIGHT` the `pos` will be teh bottom right of the widget.
+ - Not only the position, but also the size can be controlled with anchors. If `anchor=LEFT|RIGHT`, the distance from the widget
+ to both side will stay constant. Therefore the width will stretch if the window gets bigger and shrink if the window gets smaller.
+ - The `pos` of a widget always reflect the anchor: if the anchor is `BOTTOM|RIGHT` the `pos` will be the bottom right of the widget.
  If it is `LEFT`, `pos` will be the midleft of the widget. However we can always get the topleft of the widget with `widget.topleft`.
  `widget.x` and `widget.y` also work.
 
@@ -174,14 +174,14 @@ They are automatically converted to a `Color` object for ease of use. And as exp
 
 ##### Gradients
 A `Gradient(start, end, horizontal)` will fill a shape with a linear interpolation between the two colors.
-`start` and `end` must be two tuples and if `horizontal == False`, the gradient will be drawn verticall,
+`start` and `end` must be two tuples and if `horizontal == False`, the gradient will be drawn vertical,
 so `start` will be at the top of the shape and `end` at the bottom.
 
 ##### Multigradients
     ):
 A `Multigradient(*colors, positions=None, horizontal=True)` is like a `Gradient` but with more than two colors.
 
-Example for an equaly spaced blue-yellow-orange-red gradient:
+Example for an equally spaced blue-yellow-orange-red gradient:
 ```
 from graphalama.constants import BLUE, YELLOW, ORANGE, RED
 MultiGradient(BLUE, YELLOW, ORANGE, RED)
@@ -193,7 +193,7 @@ would take only a fourth. The positions are between 0 and
 ```
 MultiGradient(BLUE, YELLOW, ORANGE, RED, positions=(0, 1/4, 1/2, 1))
 ```
-Of course, the number of positions must match the number of colors, but the positions do nat have to start at 0 and
+Of course, the number of positions must match the number of colors, but the positions do not have to start at 0 and
 end at 1. For instance is the positions are `(1/2, 2/3, 1)`, the first half of the surface will be exactly of the first color.
 
 If `horizontal == False`, then the gradient is drawn top to bottom and not left to right.
@@ -214,11 +214,11 @@ You can get the code for this example [here](assets/shapes_example.py).
 
 
 There are quite a few things to note here.
-First of all, if we don't precise the position of the widgets, the will just stack verticaly n the center of the screen.
-Then, we can give any shape to a widget. Every widget can have any shape, we just need to pass it as the `shape` argument in the object initalisation.
+First of all, if we don't precise the position of the widgets, the will just stack vertically in the center of the screen.
+Then, we can give any shape to a widget. Every widget can have any shape, we just need to pass it as the `shape` argument in the object initialisation.
 Shapes are found in `graphalama.shapes`, they all accept the same parameters :
  - First the `size` of the widget, if none is given the widget will just fit its content
- - Then the argments for the specific shape, ie. the rounding of the rectangle, the equations of the parametric curve...
+ - Then the arguments for the specific shape, ie. the rounding of the rectangle, the equations of the parametric curve...
  - The `border` comes next, which specifies the width of the widget's border
  - Finally comes `min_size` and `max_size`, those are the minimum and maximum size the widget can take if the window is resized
 
@@ -233,7 +233,7 @@ There's gonna be some heavy work there, so I wont comment on the current system.
 
 ### Custom shadow
 
-Shadows put a highight on our widgets, by creating a deeper contrast between the widget and the background.
+Shadows put a highlight on our widgets, by creating a deeper contrast between the widget and the background.
 Shadows are fond in `graphalama.shadows` and they are optional: you can pass `NoShadow` to any widget and...
 it won't show nor calculate any shadow. Otherwise, a shadow accepts 4 optional arguments. Here's the signature
 
@@ -244,9 +244,9 @@ Shadow(dx=2, dy=2, blur=2, strength=100)
 The two firsts are the offset between the widget and the shadow,
 they shift the shadow by `dx` and `dy` to the right and down respectively.
 
-Optionnaly, you can blur the shadow, for a smoother result.
+Optionally, you can blur the shadow, for a smoother result.
 If blur is 0 the shadow will have the same shape as the widget with the same sharp borders.
-If blur is positive, then a gaussian blur si applied to the shape. Note that this requires pillow.
+If blur is positive, then a Gaussian blur is applied to the shape. Note that this requires pillow.
 If you don't have pillow installed, it won't blur the shadow, without raising any exception.
 
 The strength is an integer between `0` and `255`, it's how dark the shadow is.
@@ -295,6 +295,10 @@ There's gonna be some heavy work there, so I wont comment on the current system.
 
 ### Widgets
 
-###
+### Notes
+
+A special thank to risson for his help and support.
+Also, I don't maintain the library actively, but if you open issues I will look into them because I like to see people use what I made. 
+If you open feature requests, I will not implement them except maybe during a lonely rainy Saturday...
 
 

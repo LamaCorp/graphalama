@@ -187,7 +187,7 @@ class Rectangle:
 
     @property
     def margins(self):
-        """Return the margin between the border of the widge and the content rectangle."""
+        """Return the margin between the border of the widget and the content rectangle."""
         return Margins(self.border + self.padding.extra_height + max(0, self.bg_offset[0]),
                        self.border + max(0, self.bg_offset[1]),
                        self.border + self.padding.extra_width - min(0, self.bg_offset[0]),

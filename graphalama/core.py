@@ -24,8 +24,11 @@ LOGGER = logging.getLogger(__name__)
 class Widget:
 
     LAST_PLACED_WIDGET = None
+    """Last created widget. Used for automatic placement."""
     ACCEPT_CLICKS = False
+    """Whether this widget reacts to click events. It has no impact on the children event handling."""
     ACCEPT_KEYBOARD_INPUT = False
+    """Whether this widget reacts to keyboard presses. It has no impact on the children event handling."""
     HAS_CONTENT = False
 
     def __init__(self, pos=DEFAULT, shape=DEFAULT, color=DEFAULT, bg_color=DEFAULT, border_color=DEFAULT,

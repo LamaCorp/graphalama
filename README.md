@@ -220,12 +220,25 @@ Shapes are found in `graphalama.shapes`, they all accept the same parameters :
  - First the `size` of the widget, if none is given the widget will just fit its content
  - Then the arguments for the specific shape, ie. the rounding of the rectangle, the equations of the parametric curve...
  - The `border` comes next, which specifies the width of the widget's border
+ - The `padding` is then the space between the content of the widget and the border.
  - Finally comes `min_size` and `max_size`, those are the minimum and maximum size the widget can take if the window is resized
 
- Finally, a shape object is a container for all the information about the size, border, shape.
+ Finally, a shape object is a container for all the information about the size, border, shape, padding.
  If we want to change the size of a widget at runtime, we need to set ` widget.shape.size`, `widget.shape.height` or `widget.shape.width`.
 
  > Therefore a shape can be set only to ONE widget. Widgets can not share references to the same shape.
+
+#### Padding
+
+The padding is the space in pixels between the content of the widget and its border. It does not adapt on screen resize. The `Padding` class is defined in [`shapes.py`](graphalama/shapes.py) and accepts four constructors.
+
+```
+Padding(padding) -> Padding: Every side has the same size
+Padding(horizontal, vertical) -> Padding: left and right have the same size and top and bottom too
+Padding(left, top, right, bottom) -> Padding: The four sides have different sizes
+```
+
+`Shape` objects also accept integers for the padding. In the case an integer is given, it is the padding for all sides. The default padding is 2 pixels.
 
 ### Custom content
 
@@ -290,6 +303,14 @@ There's gonna be some heavy work there, so I wont comment on the current system.
 ## Tips
 
 ### The `Pos` class
+
+### WidgetList
+
+You will often find yourself with a list of widget that you want to render and update.
+`WidgetList` is a thin wraper around the builtin `list` class with the methods 
+`render(screen)`, `update(event)` and `resize(new_size, old_size)` implemented, so it acts like a widget.
+
+`WidgetList` can be contained in other `WidgetList`.
 
 ## Creating your own stuff
 

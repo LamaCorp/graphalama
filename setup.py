@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='graphalama',
-    version='0.0.1c',
+    version='0.0.2',
     description='Easy to use widgets for pygame',
     long_description=long_description,
     classifiers=[

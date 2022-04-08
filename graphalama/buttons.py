@@ -56,7 +56,7 @@ class Button(Widget):
 
     def on_click(self, event):
         LOGGER.info(f"{self} clicked")
-        Thread(self.function).start()
+        Thread(target=self.function).start()
 
     def on_mouse_button_up(self, event):
         self.invalidate_bg()

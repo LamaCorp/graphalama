@@ -1,5 +1,5 @@
 from math import pi, sin, cos
-from _dummy_thread import start_new_thread
+from threading import Thread
 import logging
 
 from graphalama.colors import ImageBrush, Color, to_color
@@ -56,7 +56,7 @@ class Button(Widget):
 
     def on_click(self, event):
         LOGGER.info(f"{self} clicked")
-        start_new_thread(self.function, ())
+        Thread(self.function).start()
 
     def on_mouse_button_up(self, event):
         self.invalidate_bg()
